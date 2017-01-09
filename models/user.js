@@ -10,37 +10,30 @@ var User = new Schema({
     password: String,
     OauthId: String,
     OauthToken: String,
-    firstName: {
+    first_name: {
         type: String,
         default: '',
         required: true
     },
-    lastName: {
+    last_name: {
         type: String,
         default: '',
         required: true
     },
-    admin: {
-        type: Boolean,
-        default: false
-    },
-    websiteUrl: String,
-    emailAddress: {
+    mobile: {
         type: String,
         required: true
     },
-    imageFile: String,
+    email_address: {
+        type: String,
+        required: true
+    },
+    profile_image: String,
     address: String,
     city: String,
     state: String,
     country: String,
-    postalCode: String,
-    profileBrief: String,
-    profile: String,
-    disciplinaryStrikes: {
-        type: Number,
-        default: 0
-    }
+    postal_code: String
 }, {
     timestamps: true
 });

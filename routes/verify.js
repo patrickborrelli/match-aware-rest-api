@@ -1,10 +1,10 @@
 var User = require('../models/user');
 var jwt = require('jsonwebtoken'); //used to create, sign and verify tokens
 var config = require('../config.js');
-var Blog = require('../models/blog');
-var Entry = require('../models/entry');
-var Comment = require('../models/comment');
-var Post = require('../models/post');
+//var Blog = require('../models/blog');
+//var Entry = require('../models/entry');
+//var Comment = require('../models/comment');
+//var Post = require('../models/post');
 
 exports.getToken = function(user) {
     return jwt.sign(user, config.secretKey, {
@@ -25,6 +25,7 @@ exports.verifyAdmin = function(req, res, next) {
         return next();
     }
 };
+/**
 
 exports.verifyBlogOwnerOrAdmin = function(req, res, next) {
     //check if verified user is an admin:
@@ -154,6 +155,7 @@ exports.verifyPostOwnerOrAdmin = function(req, res, next) {
         }
     });
 };
+*/
 
 exports.verifyOrdinaryUser = function(req, res, next) {
     //check header or url parameters or post parameters for token

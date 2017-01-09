@@ -38,7 +38,7 @@ router.get('/facebook/callback', function(req,res,next){
 */
 
 /* GET users listing. */
-router.get('/', Verify.verifyOrdinaryUser, Verify.verifyAdmin, function(req, res) {
+router.get('/', Verify.verifyOrdinaryUser, function(req, res) {
     User.find({}, function(err, users) {
         if(err) throw err;
         res.json(users);
@@ -49,29 +49,29 @@ router.post('/register', function(req, res) {
     User.register(new User(
         { 
             username : req.body.username,
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            emailAddress: req.body.emailAddress,
-            websiteUrl: req.body.websiteUrl,
-            imageFile: req.body.imageFile,
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
+            email_address: req.body.email_address,
+            mobile: req.body.mobile,
+            profile_image: req.body.profile_image,
             address: req.body.address,
             city: req.body.city,
             state: req.body.state,
             country: req.body.country,
             postalCode: req.body.postalCode,
-            profileBrief: req.body.profileBrief,
-            profile: req.body.profile
+            certifications: req.body.certifications,
+            licenses: req.body.licenses
         }
     ),
       req.body.password, function(err, user) {
         if (err) {
             return res.status(500).json({err: err});
         }
-        if(req.body.firstName) {
-            user.firstName = req.body.firstName;
+        if(req.body.first_name) {
+            user.first_name = req.body.first_name;
         }
-        if(req.body.lastName) {
-            user.lastName = req.body.lastName;
+        if(req.body.last_name) {
+            user.last_name = req.body.last_name;
         }
         user.save(function(err, user) {
             passport.authenticate('local')(req, res, function () {

@@ -1,5 +1,8 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var Certification = require('./certification.js');
+var License = require('./license.js');
+var Role = require('./role.js');
 var passportLocalMongoose = require('passport-local-mongoose');
 
 var User = new Schema({
@@ -8,6 +11,10 @@ var User = new Schema({
         required: true
     },
     password: String,
+    role: {
+        type: Schema.Types.ObjectId,
+        ref: 'Role'
+    },
     OauthId: String,
     OauthToken: String,
     first_name: {
@@ -33,7 +40,15 @@ var User = new Schema({
     city: String,
     state: String,
     country: String,
-    postal_code: String
+    postal_code: String,
+    certifications: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Certification'
+    }],
+    licenses: [{
+        type: Schema.Types.ObjectId,
+        ref: 'License'
+    }]
 }, {
     timestamps: true
 });

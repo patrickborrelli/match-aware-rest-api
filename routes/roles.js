@@ -8,16 +8,19 @@ router.use(bodyParser.json());
 
 //#################################################################################################
 //#################################################################################################
+router.route('/')
 //get all roles:
-router.get('/', function(req, res) {
-    Role.find({}, function(err, roles) {
-        if(err) throw err;
-        res.json(roles);
-    });
+.get(function(req, res) {
+    Role.find({})
+        .populate('created_by')
+        .exec(function(err, roles) {
+            if(err) throw err;
+            res.json(roles);
+    });    
 })
 
 //add a new role to the system:  
-router.post('/', Verify.verifyOrdinaryUser, function(req, res, next) {
+.post(Verify.verifyOrdinaryUser, function(req, res, next) {
     req.body.created_by = req.decoded._id;
     Role.create(req.body, function(err, role) {
         if(err) return next(err);
@@ -26,7 +29,7 @@ router.post('/', Verify.verifyOrdinaryUser, function(req, res, next) {
     });
 })
 
-router.delete('/', Verify.verifyOrdinaryUser, function(req, res, next) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     Role.remove({}, function(err, roles) {
         if(err) return next(err);
         console.log("Removed: \n" + roles);

@@ -11,10 +11,10 @@ var User = new Schema({
         required: true
     },
     password: String,
-    role: {
+    role: [{
         type: Schema.Types.ObjectId,
         ref: 'Role'
-    },
+    }],
     OauthId: String,
     OauthToken: String,
     first_name: {

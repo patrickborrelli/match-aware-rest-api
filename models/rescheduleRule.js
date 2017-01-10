@@ -2,15 +2,15 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var RescheduleRule = new Schema({
-    timespan_daye: {
+    timespan_days: {
         required: true,
-        type: number
+        type: Number
     },
     consequence: {
         type: String,
         enum: ['FORFEIT', 'FINE', 'FORFEIT_FINE']
     },
-    fine: number
+    fine: Number
 }, {
     timestamps: true
 });

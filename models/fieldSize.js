@@ -6,10 +6,14 @@ var FieldSize = new Schema({
         type: String,
         required: true
     },
-    min_length: number,
-    max_length: number,
-    min_width: number,
-    max_width: number
+    min_length: Number,
+    max_length: Number,
+    min_width: Number,
+    max_width: Number,
+    unit: {
+        type: String,
+        enum: ['FEET', 'YARDS', 'METERS']
+    }
 }, {
     timestamps: true
 });

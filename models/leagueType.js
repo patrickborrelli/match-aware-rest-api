@@ -6,10 +6,6 @@ var LeagueType = new Schema({
     name: {
         required: true,
         type: String
-    },
-    created_by: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
     }
 }, {
     timestamps: true

@@ -28,6 +28,8 @@ var club_members = require('./routes/clubMembers');
 var age_groups = require('./routes/ageGroups');
 var event_types = require('./routes/eventTypes');
 var field_sizes = require('./routes/fieldSizes');
+var league_types = require('./routes/leagueTypes');
+var reschedule_rules = require('./routes/rescheduleRules');
 
 var app = express();
 
@@ -58,6 +60,8 @@ app.use('/club_members', club_members);
 app.use('/age_groups', age_groups);
 app.use('/event_types', event_types);
 app.use('/field_sizes', field_sizes);
+app.use('/league_types', league_types);
+app.use('/reschedule_rules', reschedule_rules);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

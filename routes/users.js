@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var User = require('../models/user');
+var ClubMember = require('../models/clubMember');
 var Verify = require('./verify');
 
 /**
@@ -37,13 +38,72 @@ router.get('/facebook/callback', function(req,res,next){
 });
 */
 
-/* GET users listing. */
-router.get('/', Verify.verifyOrdinaryUser, function(req, res) {
+//#################################################################################################
+//#################################################################################################
+router.route('/')
+
+//GET all users
+.get(Verify.verifyOrdinaryUser, function(req, res) {
+    User.find(req.query)
+        .populate('ceretifications')
+        .populate('licenses')
+        .exec(function(err, users) {
+            if(err) throw err;
+            res.json(users);
+    });
+})
+
+//DELETE all users
+.delete(Verify.verifyOrdinaryUser, function(req, res) {
     User.find({}, function(err, users) {
-        if(err) throw err;
-        res.json(users);
+        if(err) return next(err);
+        console.log("Removing all users from system.");
+        console.log(users.length + " users were found and are pending delete.");
+        for(var i = users.length -1; i >= 0; i--) {
+            users[i].remove();
+        }
+        res.json("Successfully removed all users.");        
     });
 });
+
+
+//#################################################################################################
+//#################################################################################################
+router.route('/:userId')
+
+///GET user by ID
+.get(Verify.verifyOrdinaryUser, function(req, res) {
+    User.findById(req.params.userId)
+        .populate('ceretifications')
+        .populate('licenses')
+        .exec(function(err, user) {
+            if(err) throw err;
+            res.json(user);
+    });
+})
+
+//PUT update user by ID
+.put(Verify.verifyOrdinaryUser, function(req, res) {
+    User.findByIdAndUpdate(req.params.userId, {$set: req.body}, {new: true})        
+        .populate('ceretifications')
+        .populate('licenses')
+        .exec(function(err, user) {
+            if(err) throw err;
+            res.json(user);
+    });
+})
+
+///DELETE user by ID
+.delete(Verify.verifyOrdinaryUser, function(req, res) {
+    User.findById(req.params.userId)
+        .exec(function(err, user) {
+            if(err) throw err;
+            var full = user.getFullName();
+            user.remove();
+            res.json("Successfully removed " + full);
+    });
+});
+
 
 router.post('/register', function(req, res) {
     User.register(new User(
@@ -78,61 +138,6 @@ router.post('/register', function(req, res) {
                 return res.status(200).json(user);
             });
         });        
-    });
-});
-
-router.put('/:userId', Verify.verifyOrdinaryUser, function(req, res, next) {
-    var owner = req.params.userId;
-    var admin = req.decoded.admin;
-    console.log("Found owner: " + owner);
-    console.log("Found user: " + req.decoded._id);
-    if(!admin && (owner != req.decoded._id)) {
-        var err = new Error('You are not authorized to perform this operation.');
-        err.status = 403;
-        return next(err);
-    }
-    if(!admin && (req.body.admin != undefined)) {
-        var err = new Error('Only administrators may change user admin status');
-        err.status = 403;
-        return next(err);
-    }
-    User.findByIdAndUpdate(req.params.userId, {$set: req.body}, {new: true}, function(err, user) {
-        if(err) throw err;
-        res.json(user);
-    });
-});
-
-router.get('/:userId', Verify.verifyOrdinaryUser, function(req, res, next) {
-    var editUser = req.params.userId;
-    var admin = req.decoded.admin;
-    console.log("Found owner: " + editUser);
-    console.log("Found user: " + req.decoded._id);
-    if(!admin && (editUser != req.decoded._id)) {
-        var err = new Error('You are not authorized to perform this operation.');
-        err.status = 403;
-        return next(err);
-    }
-    User.findById(req.params.userId, function(err, user) {  
-        if(null != user) {
-            if(err) throw err;
-            res.status(200).json(user);
-        } else {
-            res.status(200).json({status: 'No matching user found.'});
-        }
-    });
-    
-});
-
-
-router.delete('/:userId', Verify.verifyOrdinaryUser, Verify.verifyAdmin, function(req, res, next) {
-    User.findById(req.params.userId, function(err, user) { 
-        if(null != user) {
-            if(err) throw err;
-            user.remove();
-            res.status(200).json({status: 'Successfully removed user.'});
-        } else {
-            res.status(200).json({status: 'No matching user found.'});
-        }
     });
 });
 

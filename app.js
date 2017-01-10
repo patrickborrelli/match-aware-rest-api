@@ -23,6 +23,11 @@ db.once('open', function() {
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var roles = require('./routes/roles');
+var clubs = require('./routes/clubs');
+var club_members = require('./routes/clubMembers');
+var age_groups = require('./routes/ageGroups');
+var event_types = require('./routes/eventTypes');
+var field_sizes = require('./routes/fieldSizes');
 
 var app = express();
 
@@ -48,6 +53,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 app.use('/roles', roles);
+app.use('/clubs', clubs);
+app.use('/club_members', club_members);
+app.use('/age_groups', age_groups);
+app.use('/event_types', event_types);
+app.use('/field_sizes', field_sizes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

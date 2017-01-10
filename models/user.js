@@ -54,7 +54,7 @@ var User = new Schema({
 });
 
 User.methods.getFullName = function() {
-    return(this.firstName + ' ' + this.lastName);
+    return(this.first_name + ' ' + this.last_name);
 };
 
 User.plugin(passportLocalMongoose);

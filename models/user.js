@@ -11,7 +11,7 @@ var User = new Schema({
         required: true
     },
     password: String,
-    role: [{
+    roles: [{
         type: Schema.Types.ObjectId,
         ref: 'Role'
     }],

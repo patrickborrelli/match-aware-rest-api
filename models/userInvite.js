@@ -4,7 +4,7 @@ var Role = require('./role.js');
 
 var UserInvite = new Schema({
     invite_key: {
-        type: number,
+        type: Number,
         required: true
     },
     email: String,

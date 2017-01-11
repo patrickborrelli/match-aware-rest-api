@@ -19,15 +19,14 @@ var Field = new Schema({
         ref: 'FieldSize'
     }, 
     lights: Boolean,
-    condition: number,
-    game: boolean, 
-    practice: boolean,
-    tournament: boolean,
+    condition: Number,
+    game: Boolean, 
+    practice: Boolean,
+    tournament: Boolean,
     surface: {
         type: String,
         enum: ['GRASS', 'TURF']
     }
-}
 }, {
     timestamps: true
 });

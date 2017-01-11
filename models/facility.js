@@ -26,8 +26,8 @@ var Facility = new Schema({
         required: true,
         type: String
     }, 
-    latitude: number,
-    longitude: number,
+    latitude: Number,
+    longitude: Number,
     sun_start_time: String,
     sun_stop_time: String,
     mon_start_time: String,

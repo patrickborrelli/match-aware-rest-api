@@ -9,20 +9,20 @@ var Rule = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'League'
     },
-    age_group: {
+    age_group: { 
         required: true,
         type: Schema.Types.ObjectId,
         ref: 'AgeGroup'
     },
-    duration_minutes: number,
-    fielded_players: number,
+    duration_minutes: Number,
+    fielded_players: Number,
     goalkeeper: Boolean,
-    max_field_length: number,
-    max_field_width: number,
-    goal_width_ft: number,
-    goal_height_ft: number,
-    num_periods: number,
-    period_duration_minutes: number,
+    max_field_length: Number,
+    max_field_width: Number,
+    goal_width_ft: Number,
+    goal_height_ft: Number,
+    num_periods: Number,
+    period_duration_minutes: Number,
     ball_size: {
         type: String,
         enum: ['2', '3', '4', '5']

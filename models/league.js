@@ -28,8 +28,7 @@ var League = new Schema({
     },
     reschedule_rule: {
         type: Schema.Types.ObjectId,
-        ref: 'RescheduleRule',
-        required: true
+        ref: 'RescheduleRule'
     },
 }, {
     timestamps: true

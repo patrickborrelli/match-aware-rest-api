@@ -25,7 +25,7 @@ var AccessRequest = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Team'
     },
-    owner: {
+    approver: {
         required: true,
         type: Schema.Types.ObjectId,
         ref: 'User'

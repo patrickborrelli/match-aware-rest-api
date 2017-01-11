@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var Role = require('../models/role');
+var Facility = require('../models/facility');
 var Verify = require('./verify');
 
 var router = express.Router();
@@ -10,65 +10,61 @@ router.use(bodyParser.json());
 //#################################################################################################
 router.route('/')
 
-//get all roles:
+//get all facilities:
 .get(function(req, res) {
-    Role.find({})
-        .populate('created_by')
-        .exec(function(err, roles) {
+    Facility.find({})
+        .exec(function(err, facilities) {
             if(err) throw err;
-            res.json(roles);
+            res.json(facilities);
     });    
 })
 
-//add a new role to the system:  
+//add a new facility to the system:  
 .post(Verify.verifyOrdinaryUser, function(req, res, next) {
-    console.log("Decoded id = " + req.decoded._id);
-    req.body.created_by = req.decoded._id;
-    console.log("Retrieved req.body.created_by: " + req.body.created_by);
-    Role.create(req.body, function(err, role) {
+    Facility.create(req.body, function(err, facility) {
         if(err) return next(err);
-        console.log("New role created");
-        res.json(role);
+        console.log("New facility created");
+        res.json(facility);
     });
 })
 
 .delete(Verify.verifyOrdinaryUser, function(req, res, next) {
-    Role.remove({}, function(err, roles) {
+    Facility.remove({}, function(err, facilities) {
         if(err) return next(err);
-        console.log("Removed: \n" + roles);
-        res.json("All roles removed.");
+        console.log("Removed: \n" + facilities);
+        res.json("All facilities removed.");
     });
 });
 
 //#################################################################################################
 //#################################################################################################
-router.route('/:roleId')
+router.route('/:facilityId')
 
-///GET role by ID
+///GET facility by ID
 .get(Verify.verifyOrdinaryUser, function(req, res) {
-    Role.findById(req.params.roleId)
-        .exec(function(err, role) {
+    Facility.findById(req.params.facilityId)
+        .exec(function(err, facility) {
             if(err) throw err;
-            res.json(role);
+            res.json(facility);
     });
 })
 
-//PUT update role by ID
+//PUT update facility by ID
 .put(Verify.verifyOrdinaryUser, function(req, res) {
-    Role.findByIdAndUpdate(req.params.roleId, {$set: req.body}, {new: true}) 
-        .exec(function(err, role) {
+    Facility.findByIdAndUpdate(req.params.facilityId, {$set: req.body}, {new: true}) 
+        .exec(function(err, facility) {
             if(err) throw err;
-            res.json(role);
+            res.json(facility);
     });
 })
 
-///DELETE role by ID
+///DELETE facility by ID
 .delete(Verify.verifyOrdinaryUser, function(req, res) {
-    Role.findById(req.params.roleId)
-        .exec(function(err, role) {
+    Facility.findById(req.params.facilityId)
+        .exec(function(err, facility) {
             if(err) throw err;
-            role.remove();
-            res.json("Successfully removed role " + role.name);
+            facility.remove();
+            res.json("Successfully removed facility " + facility.name);
     });
 });
 

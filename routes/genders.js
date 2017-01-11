@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var Role = require('../models/role');
+var Gender = require('../models/gender');
 var Verify = require('./verify');
 
 var router = express.Router();
@@ -10,65 +10,61 @@ router.use(bodyParser.json());
 //#################################################################################################
 router.route('/')
 
-//get all roles:
+//get all genders:
 .get(function(req, res) {
-    Role.find({})
-        .populate('created_by')
-        .exec(function(err, roles) {
+    Gender.find({})
+        .exec(function(err, genders) {
             if(err) throw err;
-            res.json(roles);
+            res.json(genders);
     });    
 })
 
-//add a new role to the system:  
+//add a new gender to the system:  
 .post(Verify.verifyOrdinaryUser, function(req, res, next) {
-    console.log("Decoded id = " + req.decoded._id);
-    req.body.created_by = req.decoded._id;
-    console.log("Retrieved req.body.created_by: " + req.body.created_by);
-    Role.create(req.body, function(err, role) {
+    Gender.create(req.body, function(err, gender) {
         if(err) return next(err);
-        console.log("New role created");
-        res.json(role);
+        console.log("New gender created");
+        res.json(gender);
     });
 })
 
 .delete(Verify.verifyOrdinaryUser, function(req, res, next) {
-    Role.remove({}, function(err, roles) {
+    Gender.remove({}, function(err, genders) {
         if(err) return next(err);
-        console.log("Removed: \n" + roles);
-        res.json("All roles removed.");
+        console.log("Removed: \n" + genders);
+        res.json("All genders removed.");
     });
 });
 
 //#################################################################################################
 //#################################################################################################
-router.route('/:roleId')
+router.route('/:genderId')
 
-///GET role by ID
+///GET gender by ID
 .get(Verify.verifyOrdinaryUser, function(req, res) {
-    Role.findById(req.params.roleId)
-        .exec(function(err, role) {
+    Gender.findById(req.params.genderId)
+        .exec(function(err, gender) {
             if(err) throw err;
-            res.json(role);
+            res.json(gender);
     });
 })
 
-//PUT update role by ID
+//PUT update gender by ID
 .put(Verify.verifyOrdinaryUser, function(req, res) {
-    Role.findByIdAndUpdate(req.params.roleId, {$set: req.body}, {new: true}) 
-        .exec(function(err, role) {
+    Gender.findByIdAndUpdate(req.params.genderId, {$set: req.body}, {new: true}) 
+        .exec(function(err, gender) {
             if(err) throw err;
-            res.json(role);
+            res.json(gender);
     });
 })
 
-///DELETE role by ID
+///DELETE gender by ID
 .delete(Verify.verifyOrdinaryUser, function(req, res) {
-    Role.findById(req.params.roleId)
-        .exec(function(err, role) {
+    Gender.findById(req.params.genderId)
+        .exec(function(err, gender) {
             if(err) throw err;
-            role.remove();
-            res.json("Successfully removed role " + role.name);
+            gender.remove();
+            res.json("Successfully removed gender " + gender.name);
     });
 });
 

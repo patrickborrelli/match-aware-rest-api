@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var Role = require('../models/role');
+var League = require('../models/league');
 var Verify = require('./verify');
 
 var router = express.Router();
@@ -10,65 +10,65 @@ router.use(bodyParser.json());
 //#################################################################################################
 router.route('/')
 
-//get all roles:
+//get all leagues:
 .get(function(req, res) {
-    Role.find({})
-        .populate('created_by')
-        .exec(function(err, roles) {
+    League.find({})
+        .populate('min_age_group')
+        .populate('max_age_group')
+        .populate('type')
+        .populate('reschedule_rule')
+        .exec(function(err, leagues) {
             if(err) throw err;
-            res.json(roles);
+            res.json(leagues);
     });    
 })
 
-//add a new role to the system:  
+//add a new league to the system:  
 .post(Verify.verifyOrdinaryUser, function(req, res, next) {
-    console.log("Decoded id = " + req.decoded._id);
-    req.body.created_by = req.decoded._id;
-    console.log("Retrieved req.body.created_by: " + req.body.created_by);
-    Role.create(req.body, function(err, role) {
+    League.create(req.body, function(err, league) {
         if(err) return next(err);
-        console.log("New role created");
-        res.json(role);
+        console.log("New league created");
+        res.json(league);
     });
 })
 
 .delete(Verify.verifyOrdinaryUser, function(req, res, next) {
-    Role.remove({}, function(err, roles) {
+    League.remove({}, function(err, leagues) {
         if(err) return next(err);
-        console.log("Removed: \n" + roles);
-        res.json("All roles removed.");
+        console.log("Removed: \n" + leagues);
+        res.json("All leagues removed.");
     });
 });
 
 //#################################################################################################
 //#################################################################################################
-router.route('/:roleId')
+router.route('/:leagueId')
 
-///GET role by ID
+///GET league by ID
 .get(Verify.verifyOrdinaryUser, function(req, res) {
-    Role.findById(req.params.roleId)
-        .exec(function(err, role) {
+    League.findById(req.params.leagueId)
+        .exec(function(err, league) {
             if(err) throw err;
-            res.json(role);
+            res.json(league);
     });
 })
 
-//PUT update role by ID
+//PUT update league by ID
 .put(Verify.verifyOrdinaryUser, function(req, res) {
-    Role.findByIdAndUpdate(req.params.roleId, {$set: req.body}, {new: true}) 
-        .exec(function(err, role) {
+    League.findByIdAndUpdate(req.params.leagueId, {$set: req.body}, {new: true}) 
+        .exec(function(err, league) {
             if(err) throw err;
-            res.json(role);
+            res.json(league);
     });
 })
 
-///DELETE role by ID
+///DELETE league by ID
 .delete(Verify.verifyOrdinaryUser, function(req, res) {
-    Role.findById(req.params.roleId)
-        .exec(function(err, role) {
+    League.findById(req.params.leagueId)
+        .exec(function(err, league) {
             if(err) throw err;
-            role.remove();
-            res.json("Successfully removed role " + role.name);
+            league.remove();
+            res.json("Successfully removed league " + league.name);
     });
 });
 

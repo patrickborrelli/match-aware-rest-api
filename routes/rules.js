@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var Role = require('../models/role');
+var Rule = require('../models/rule');
 var Verify = require('./verify');
 
 var router = express.Router();
@@ -10,65 +10,77 @@ router.use(bodyParser.json());
 //#################################################################################################
 router.route('/')
 
-//get all roles:
+//get all rules:
 .get(function(req, res) {
-    Role.find({})
-        .populate('created_by')
-        .exec(function(err, roles) {
+    Rule.find({})
+        .populate('league')
+        .populate('age_group')
+        .exec(function(err, rules) {
             if(err) throw err;
-            res.json(roles);
+            res.json(rules);
     });    
 })
 
-//add a new role to the system:  
+//add a new rule to the system:  
 .post(Verify.verifyOrdinaryUser, function(req, res, next) {
     console.log("Decoded id = " + req.decoded._id);
     req.body.created_by = req.decoded._id;
     console.log("Retrieved req.body.created_by: " + req.body.created_by);
-    Role.create(req.body, function(err, role) {
+    Rule.create(req.body, function(err, rule) {
         if(err) return next(err);
-        console.log("New role created");
-        res.json(role);
+        console.log("New rule created");
+        res.json(rule);
     });
 })
 
 .delete(Verify.verifyOrdinaryUser, function(req, res, next) {
-    Role.remove({}, function(err, roles) {
+    Rule.remove({}, function(err, rules) {
         if(err) return next(err);
-        console.log("Removed: \n" + roles);
-        res.json("All roles removed.");
+        console.log("Removed: \n" + rules);
+        res.json("All rules removed.");
     });
 });
 
 //#################################################################################################
 //#################################################################################################
-router.route('/:roleId')
+router.route('/:ruleId')
 
-///GET role by ID
+///GET rule by ID
 .get(Verify.verifyOrdinaryUser, function(req, res) {
-    Role.findById(req.params.roleId)
-        .exec(function(err, role) {
+    Rule.findById(req.params.ruleId)        
+        .populate('league')
+        .populate('age_group')
+        .exec(function(err, rule) {
             if(err) throw err;
-            res.json(role);
+            res.json(rule);
     });
 })
 
-//PUT update role by ID
+//PUT update rule by ID
 .put(Verify.verifyOrdinaryUser, function(req, res) {
-    Role.findByIdAndUpdate(req.params.roleId, {$set: req.body}, {new: true}) 
-        .exec(function(err, role) {
+    Rule.findByIdAndUpdate(req.params.ruleId, {$set: req.body}, {new: true}) 
+        .exec(function(err, rule) {
             if(err) throw err;
-            res.json(role);
+            res.json(rule);
     });
 })
 
-///DELETE role by ID
+///DELETE rule by ID
 .delete(Verify.verifyOrdinaryUser, function(req, res) {
-    Role.findById(req.params.roleId)
-        .exec(function(err, role) {
+    var ruleName;
+    Rule.findById(req.params.ruleId)               
+        .populate('league')
+        .populate('age_group')
+        .exec(function(err, rule) {
             if(err) throw err;
-            role.remove();
-            res.json("Successfully removed role " + role.name);
+            if(rule != null) {
+                ruleName = rule.league.short_name + "/" + rule.age_group.name;
+                rule.remove();
+                res.json("Successfully removed rule " + ruleName );
+            } else {
+                res.json("No rule found to delete.")
+            }
+            
     });
 });
 

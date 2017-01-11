@@ -47,6 +47,7 @@ router.route('/')
     User.find(req.query)
         .populate('ceretifications')
         .populate('licenses')
+        .populate('roles')
         .exec(function(err, users) {
             if(err) throw err;
             res.json(users);
@@ -76,6 +77,7 @@ router.route('/:userId')
     User.findById(req.params.userId)
         .populate('ceretifications')
         .populate('licenses')
+        .populate('roles')
         .exec(function(err, user) {
             if(err) throw err;
             res.json(user);
@@ -87,6 +89,7 @@ router.route('/:userId')
     User.findByIdAndUpdate(req.params.userId, {$set: req.body}, {new: true})        
         .populate('ceretifications')
         .populate('licenses')
+        .populate('roles')
         .exec(function(err, user) {
             if(err) throw err;
             res.json(user);
@@ -120,7 +123,8 @@ router.post('/register', function(req, res) {
             country: req.body.country,
             postalCode: req.body.postalCode,
             certifications: req.body.certifications,
-            licenses: req.body.licenses
+            licenses: req.body.licenses,
+            roles: req.body.roles
         }
     ),
       req.body.password, function(err, user) {

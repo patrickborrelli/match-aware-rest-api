@@ -14,6 +14,7 @@ var Event = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'EventType'
     },
+    replaces: this,
     away_team: {
         type: Schema.Types.ObjectId,
         ref: 'Team'
@@ -46,9 +47,28 @@ var Event = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     }],
-    date: Date,
-    start_time: String,
-    end_time: String,
+    date_year: {
+        type: String,
+        required: true
+    },
+    date_month:  {
+        type: String,
+        required: true
+    },
+    date_day:  {
+        type: String,
+        required: true
+    },
+    start: Number,
+    end: Number,
+    start_time:  {
+        type: String,
+        required: true
+    },
+    end_time:  {
+        type: String,
+        required: true
+    },
     field: {
         type: Schema.Types.ObjectId,
         ref: 'Field'
@@ -56,7 +76,11 @@ var Event = new Schema({
     recurring: Boolean,
     status: {
         type: String,
-        enum: ['PROPOSED', 'PENDING', 'SCHEDULED_PENDING_ASSIGNMENT', 'SCHEDULED', 'COMPLETED', 'PENDING_RESCHEDULE', 'PENDING_CHANGE_REQUEST']
+        enum: ['PROPOSED', 'PENDING', 'CONFLICTED', 'SCHEDULED_PENDING_ASSIGNMENT', 'SCHEDULED', 'COMPLETED', 'PENDING_RESCHEDULE', 'PENDING_CHANGE_REQUEST']
+    },
+    conflicted_with: {
+        type: Schema.Types.ObjectId,
+        ref: 'Event'
     },
     creator: {
         type: Schema.Types.ObjectId,

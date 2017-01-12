@@ -3,6 +3,10 @@ var router = express.Router();
 var passport = require('passport');
 var User = require('../models/user');
 var ClubMember = require('../models/clubMember');
+var Certification = require('../models/certification');
+var License = require('../models/license');
+var Role = require('../models/role');
+var Organization = require('../models/organization');
 var Verify = require('./verify');
 
 /**
@@ -108,6 +112,38 @@ router.route('/:userId')
 });
 
 
+//#################################################################################################
+//#################################################################################################
+router.route('/findByOrganization/:organizationId')
+
+///GET users working for a training organization
+.get(Verify.verifyOrdinaryUser, function(req, res) {
+    Organization.findById(req.params.organizationId)
+        .populate({ 
+             path: 'staff',
+             model: 'User',
+             populate: {
+               path: 'certifications',
+               model: 'Certification'
+             }, 
+             populate: {
+               path: 'licenses',
+               model: 'License'
+             },
+             populate: {
+               path: 'roles',
+               model: 'Role'
+             },
+          })
+        .exec(function(err, organization) {
+            if(err) throw err;
+            res.json(organization.staff);
+    });
+})
+
+
+//#################################################################################################
+//#################################################################################################
 router.post('/register', function(req, res) {
     User.register(new User(
         { 

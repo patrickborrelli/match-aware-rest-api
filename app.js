@@ -42,6 +42,11 @@ var fields = require('./routes/fields');
 var league_teams = require('./routes/leagueTeams');
 var user_invites = require('./routes/userInvites');
 var user_settings = require('./routes/userSettings');
+var organizations = require('./routes/organizations');
+var events = require('./routes/events');
+var change_requests = require('./routes/changeRequests');
+var messages = require('./routes/messages');
+var notifications = require('./routes/notifications');
 
 var app = express();
 
@@ -86,6 +91,11 @@ app.use('/fields', fields);
 app.use('/league_teams', league_teams);
 app.use('/user_invites', user_invites);
 app.use('/user_settings', user_settings);
+app.use('/organizations', organizations);
+app.use('/events', events);
+app.use('/change_requests', change_requests);
+app.use('/messages', messages);
+app.use('/notifications', notifications);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -14,7 +14,11 @@ var ChangeRequest = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Event'
     },
-    status: String,   //TODO: decide on appropriate change request status enum
+    status: {
+        type: String,   
+        enum: ['SUBMITTED','PENDING','REJECTED','ACCEPTED']
+    },
+    text: String,
     approver:  {
         required: true,
         type: Schema.Types.ObjectId,

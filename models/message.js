@@ -9,10 +9,14 @@ var Message = new Schema({
         ref: 'Event'
     },
     text: String,
-    created_date: Date,
+    created_date: Number,
     sender: {
         type: Schema.Types.ObjectId,
         ref: 'User'
+    },
+    visible: {
+        type: Boolean,
+        default: true
     },
     recipient: {
         type: Schema.Types.ObjectId,

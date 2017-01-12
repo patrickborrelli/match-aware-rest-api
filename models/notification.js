@@ -4,20 +4,26 @@ var Event = require('./event.js');
 var User = require('./user.js');
 
 var Notification = new Schema({
-    status: {  //TODO: define suitable enum for notification status
+    //the status field is only used with an assignment type of notification, indicates the assignees response
+    status: {  
         type: String,
-        required: true
+        enum: ['SUBMITTED', 'PENDING', 'ACCEPTED', 'REJECTED']
     },
-    type: {  //TODO: define suitable enum for notification type
+    type: { 
         type: String,
-        required: true
+        required: true,
+        enum: ['ASSIGNMENT', 'GENERAL', 'CLOSURE', 'NEW_EVENT', 'NEW_MESSAGE', 'MODIFIED_EVENT']
+    },
+    //the position field is only used with an assignment type of notification, indicating which position the ref or trainer is assigned to.
+    position: {
+        type: String,
+        enum: ['CENTER', 'SIDELINE', 'HEAD', 'ASSISTANT']
     },
     event: {
         type: Schema.Types.ObjectId,
         ref: 'Event'
     },
     text: String,
-    created_date: Date,
     sender: {
         type: Schema.Types.ObjectId,
         ref: 'User'

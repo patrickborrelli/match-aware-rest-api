@@ -34,8 +34,7 @@ var leagues = require('./routes/leagues');
 var rules = require('./routes/rules');
 var genders = require('./routes/genders');
 var teams = require('./routes/teams');
-var team_coaches = require('./routes/teamCoaches');
-var team_players = require('./routes/teamPlayers');
+var team_members = require('./routes/teamMembers');
 var access_requests = require('./routes/accessRequests');
 var facilities = require('./routes/facilities');
 var fields = require('./routes/fields');
@@ -47,6 +46,7 @@ var events = require('./routes/events');
 var change_requests = require('./routes/changeRequests');
 var messages = require('./routes/messages');
 var notifications = require('./routes/notifications');
+var field_availabilities = require('./routes/fieldAvailabilities');
 
 var app = express();
 
@@ -83,8 +83,7 @@ app.use('/leagues', leagues);
 app.use('/rules', rules);
 app.use('/genders', genders);
 app.use('/teams', teams);
-app.use('/team_coaches', team_coaches);
-app.use('/team_players', team_players);
+app.use('/team_members', team_members);
 app.use('/access_requests', access_requests);
 app.use('/facilities', facilities);
 app.use('/fields', fields);
@@ -96,6 +95,7 @@ app.use('/events', events);
 app.use('/change_requests', change_requests);
 app.use('/messages', messages);
 app.use('/notifications', notifications);
+app.use('/field_availabilities', field_availabilities);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

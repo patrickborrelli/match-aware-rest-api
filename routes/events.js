@@ -55,8 +55,8 @@ router.route('/')
                            " and end gt: " +req.body.start + " or with a start lt: " + req.body.end + 
                            " and end gte: " + req.body.end);
                 Event.findOne({$or: [
-                              { $and: [{start: {$lte: req.body.start}}, {end: {$gt: req.body.start}}] },
-                              { $and: [{start: {$lt: req.body.end}}, {end: {$gte: req.body.end}}] }
+                              { $and: [{start: {$lte: req.body.start}}, {end: {$gt: req.body.start}}, {field: req.body.field}] },
+                              { $and: [{start: {$lt: req.body.end}}, {end: {$gte: req.body.end}}, {field: req.body.field}] }
                           ]})
                     .exec(function(err, conflictingEntry) {
                         if(err) return next(err);                        
@@ -139,12 +139,13 @@ router.route('/:eventId')
     var scheduleChange = false;
     var necessaryData = false;
     
-    //determine if request changes any date/time information:
+    //determine if request changes any date/time/field information:
     if( (req.body.date_year ||
          req.body.date_month ||
          req.body.date_day ||
          req.body.start_time ||
-         req.body.end_time) != null) {
+         req.body.end_time ||
+         req.body.field ) != null) {
         
         //this is a date/time change:
         scheduleChange = true;
@@ -197,8 +198,8 @@ router.route('/:eventId')
                     Event.findOne({$and: [
                                         {_id: { $ne: current._id }},
                                         {$or: [
-                                            { $and: [{start: {$lte: req.body.start}}, {end: {$gt: req.body.start}}] },
-                                            { $and: [{start: {$lt: req.body.end}}, {end: {$gte: req.body.end}}] }
+                                            { $and: [{start: {$lte: req.body.start}}, {end: {$gt: req.body.start}}, {field: req.body.field}] },
+                                            { $and: [{start: {$lt: req.body.end}}, {end: {$gte: req.body.end}}, {field: req.body.field}] }
                                         ]}
                                    ]}
                                   )

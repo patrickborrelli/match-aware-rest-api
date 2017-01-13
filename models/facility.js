@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var Club = require('./club.js');
 
 var Facility = new Schema({
     name: {
@@ -10,6 +11,10 @@ var Facility = new Schema({
         required: true,
         type: String
     }, 
+    club_affiliation: {
+        type: Schema.Types.ObjectId,
+        ref: 'Club'
+    },
     address: {
         required: true,
         type: String

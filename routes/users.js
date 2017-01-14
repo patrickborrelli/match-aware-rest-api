@@ -202,6 +202,7 @@ router.post('/login', function(req, res, next) {
       res.status(200).json({
         status: 'Login successful!',
         success: true,
+        fullname: user.getFullName(),
         token: token
       });
     }); 

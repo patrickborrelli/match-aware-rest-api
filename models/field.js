@@ -23,6 +23,7 @@ var Field = new Schema({
     game: Boolean, 
     practice: Boolean,
     tournament: Boolean,
+    training: Boolean,
     surface: {
         type: String,
         enum: ['GRASS', 'TURF']

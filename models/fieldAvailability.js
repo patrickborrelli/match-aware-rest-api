@@ -10,8 +10,30 @@ var FieldAvailability = new Schema({
     game: Boolean,
     practice: Boolean,
     tournament: Boolean,
-    start: Number,
-    end: Number,
+    training: Boolean,
+    start: {
+        type: Number,
+        required: true
+    },
+    end: {
+        type: Number,
+        required: true
+    },
+    date_year: {
+        type: String
+    },
+    date_month:  {
+        type: String
+    },
+    date_day:  {
+        type: String
+    },
+    start_time:  {
+        type: String
+    },
+    end_time:  {
+        type: String
+    },
     duration: Number
 }, {
     timestamps: true

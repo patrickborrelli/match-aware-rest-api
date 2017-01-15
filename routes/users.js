@@ -203,7 +203,8 @@ router.post('/login', function(req, res, next) {
         status: 'Login successful!',
         success: true,
         fullname: user.getFullName(),
-        token: token
+        token: token,
+        userId: user._id
       });
     }); 
   })(req,res,next);

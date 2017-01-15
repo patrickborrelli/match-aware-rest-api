@@ -12,7 +12,7 @@ router.route('/')
 
 //get all roles:
 .get(function(req, res) {
-    Role.find({})
+    Role.find(req.query)
         .populate('created_by')
         .exec(function(err, roles) {
             if(err) throw err;

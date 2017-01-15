@@ -114,6 +114,27 @@ router.route('/:userId')
 
 //#################################################################################################
 //#################################################################################################
+router.route('/addUserRole/:userId/:roleId')
+
+///GET user by ID
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
+    User.findById(req.params.userId)
+        .populate('ceretifications')
+        .populate('licenses')
+        .populate('roles')
+        .exec(function(err, user) {
+            if(err) throw err;
+            user.roles.push(req.params.roleId);
+            user.save(function(err, user) {
+                if(err) return next(err);
+                res.json(user);
+            });        
+    });
+});
+
+
+//#################################################################################################
+//#################################################################################################
 router.route('/findByOrganization/:organizationId')
 
 ///GET users working for a training organization

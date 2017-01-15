@@ -5,6 +5,7 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var passport = require('passport');
+var cors = require('cors');
 
 var authenticate = require('./authenticate');
 var config = require('./config');
@@ -66,6 +67,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //passport config:
 app.use(passport.initialize());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(cors());
 
 app.use('/', routes);
 app.use('/users', users);

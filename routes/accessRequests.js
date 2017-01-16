@@ -99,7 +99,7 @@ router.route('/findByApprover/:userId')
 
 ///GET all access requests pending review by this user
 .get(Verify.verifyOrdinaryUser, function(req, res) {
-    AccessRequest.find({approver: req.params.userId, status: "PENDING"})        
+    AccessRequest.find({approver: req.params.userId, {$or: [{status: "PENDING"},{status: "SENT"}]})        
         .populate('user')
         .populate('club')
         .populate('role')

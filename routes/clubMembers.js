@@ -52,48 +52,44 @@ router.route('/')
 router.route('/findClubAdmin/:clubId')
 
 ///GET the administrative user for this club
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     async.waterfall(
         [
             function(callback) {
                 ClubMember.find({club: req.params.clubId})
                     .populate('club')
-                    .populate({ 
-                         path: 'user',
-                         model: 'User',
-                         populate: {
-                           path: 'roles',
-                           model: 'Role'
-                         }
-                      })
+                    .populate('user')
                     .exec(function(err, members) {
                         if(err) return next(err);
-                        console.log("Found " + members.length + " clubmembers.");
                         callback(null, members);
-                    });
-                
+                    });                
             },
-            function(clubMembers, callback) {
-                User.findOne( { $and: [
-                    {"_id": 
-                        { "$in": clubMembers.map(function(cm) { return cm.user._id }) }
-                    },
-                    {"roles.name": "CLUB_ADMIN"}
-                    ]}
-                )                
-                .populate('ceretifications')
-                .populate('licenses')
-                .populate('roles')
-                .exec(function(err, users) {
-                    if(err) return next(err);
-                    res.json(users);
-                    callback(null, users);
+            function(members, callback) {
+                Role.findOne({"name": "CLUB_ADMIN"})
+                    .exec(function(err, role) {
+                        if(err) return next(err);
+                        callback(null, members, role._id);
                 });
+            },
+            function(members, roleId, callback) {
+                var adminUser = null;
+                User.find({"_id": { "$in": members.map(function(cm) {return cm.user._id })}}) 
+                    .exec(function(err, users) {
+                        if(err) return next(err);
+                        for(var i = 0; i < users.length; i++) {
+                            for(var j = 0; j < users[i].roles.length; j++) {
+                                if(String(users[i].roles[j]) == String(roleId)) {
+                                    adminUser = users[i];
+                                }
+                            }
+                        }
+                        callback(null, adminUser);
+                    });
             }
         ],
-        function(err, users) {
+        function(err, user) {
             if(err) return next(err);
-            console.log("Found users : " + users);
+            res.json(user);
         }
     )
 });

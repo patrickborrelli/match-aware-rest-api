@@ -12,7 +12,7 @@ router.route('/')
 
 //get all access requests:
 .get(function(req, res) {
-    AccessRequest.find({})
+    AccessRequest.find(req.query)
         .populate('user')
         .populate('club')
         .populate('role')

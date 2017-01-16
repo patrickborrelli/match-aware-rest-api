@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var AccessRequest = require('../models/accessRequest');
 var Verify = require('./verify');
+var Role = require('../models/role.js');
 
 var router = express.Router();
 router.use(bodyParser.json());
@@ -13,7 +14,14 @@ router.route('/')
 //get all access requests:
 .get(function(req, res) {
     AccessRequest.find(req.query)
-        .populate('user')
+        .populate({ 
+             path: 'user',
+             model: 'User',
+             populate: {
+               path: 'roles',
+               model: 'Role'
+             }
+          })
         .populate('club')
         .populate('role')
         .populate('team')
@@ -48,7 +56,14 @@ router.route('/:accessRequestId')
 ///GET access request by ID
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     AccessRequest.findById(req.params.accessRequestId)        
-        .populate('user')
+        .populate({ 
+             path: 'user',
+             model: 'User',
+             populate: {
+               path: 'roles',
+               model: 'Role'
+             }
+          })
         .populate('club')
         .populate('role')
         .populate('team')
@@ -72,7 +87,14 @@ router.route('/:accessRequestId')
 .delete(Verify.verifyOrdinaryUser, function(req, res) {
     var accessRequestName;
     AccessRequest.findById(req.params.accessRequestId)               
-        .populate('user')
+        .populate({ 
+             path: 'user',
+             model: 'User',
+             populate: {
+               path: 'roles',
+               model: 'Role'
+             }
+          })
         .populate('club')
         .populate('role')
         .populate('team')
@@ -105,7 +127,14 @@ router.route('/findByApprover/:userId')
                                   { approver: req.params.userId }
                             ]
                        })      
-        .populate('user')
+        .populate({ 
+             path: 'user',
+             model: 'User',
+             populate: {
+               path: 'roles',
+               model: 'Role'
+             }
+          })
         .populate('club')
         .populate('role')
         .populate('team')
@@ -124,7 +153,14 @@ router.route('/findByStatus/:status')
 ///GET all access requests with the provided status
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     AccessRequest.find({status: req.params.status})        
-        .populate('user')
+        .populate({ 
+             path: 'user',
+             model: 'User',
+             populate: {
+               path: 'roles',
+               model: 'Role'
+             }
+          })
         .populate('club')
         .populate('role')
         .populate('team')

@@ -35,7 +35,10 @@ var User = new Schema({
         type: String,
         required: true
     },
-    profile_image: String,
+    profile_image: {
+        type: String,
+        default: './iamges/defaultUser.png'
+    }
     address: String,
     city: String,
     state: String,

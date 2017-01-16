@@ -115,10 +115,11 @@ router.route('/findClubMembers/:clubId')
                 
             },
             function(clubMembers, callback) {
-                User.find({"_id": { "$in": clubMembers.map(function(cm) {
-                        return cm.user._id })
-                    }
-                }, function(err, users) {
+                User.find({"_id": { "$in": clubMembers.map(function(cm) { return cm.user._id })}})
+                    .populate('ceretifications')
+                    .populate('licenses')
+                    .populate('roles')
+                    .exec(function(err, users) {
                     if(err) return next(err);
                     res.json(users);
                     callback(null, users);

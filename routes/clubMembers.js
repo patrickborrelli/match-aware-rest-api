@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var ClubMember = require('../models/clubMember');
 var Club = require('../models/club');
 var User = require('../models/user');
+var Role = require('../models/role');
 var Verify = require('./verify');
 var async = require('async');
 
@@ -44,6 +45,57 @@ router.route('/')
         }
         res.json("Successfully removed all clubMembers.");        
     });
+});
+
+//#################################################################################################
+//#################################################################################################
+router.route('/findClubAdmin/:clubId')
+
+///GET the administrative user for this club
+.get(Verify.verifyOrdinaryUser, function(req, res) {
+    async.waterfall(
+        [
+            function(callback) {
+                ClubMember.find({club: req.params.clubId})
+                    .populate('club')
+                    .populate({ 
+                         path: 'user',
+                         model: 'User',
+                         populate: {
+                           path: 'roles',
+                           model: 'Role'
+                         }
+                      })
+                    .exec(function(err, members) {
+                        if(err) return next(err);
+                        console.log("Found " + members.length + " clubmembers.");
+                        callback(null, members);
+                    });
+                
+            },
+            function(clubMembers, callback) {
+                User.findOne( { $and: [
+                    {"_id": 
+                        { "$in": clubMembers.map(function(cm) { return cm.user._id }) }
+                    },
+                    {"roles.name": "CLUB_ADMIN"}
+                    ]}
+                )                
+                .populate('ceretifications')
+                .populate('licenses')
+                .populate('roles')
+                .exec(function(err, users) {
+                    if(err) return next(err);
+                    res.json(users);
+                    callback(null, users);
+                });
+            }
+        ],
+        function(err, users) {
+            if(err) return next(err);
+            console.log("Found users : " + users);
+        }
+    )
 });
 
 

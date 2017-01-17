@@ -30,6 +30,10 @@ var League = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'RescheduleRule'
     },
+    logo_url: {
+        type: String,
+        default: './images/noLogo.png'
+    }
 }, {
     timestamps: true
 });

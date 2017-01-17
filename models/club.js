@@ -10,7 +10,10 @@ var Club = new Schema({
         type: String,
         required: true
     },
-    logo_url : String
+    logo_url: {
+        type: String,
+        default: './images/no-logo.png'
+    }
 }, {
     timestamps: true
 });

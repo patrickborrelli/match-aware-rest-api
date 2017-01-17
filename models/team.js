@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Gender = require('./gender.js');
+var Club = require('./club.js');
 var AgeGroup = require('./ageGroup.js');
 
 var Team = new Schema({
@@ -16,6 +17,10 @@ var Team = new Schema({
     age_group: {
         type: Schema.Types.ObjectId,
         ref: 'AgeGroup'
+    },
+    club: {
+        type: Schema.Types.ObjectId,
+        ref: 'club'
     }
 }, {
     timestamps: true

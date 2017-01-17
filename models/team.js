@@ -20,7 +20,7 @@ var Team = new Schema({
     },
     club: {
         type: Schema.Types.ObjectId,
-        ref: 'club'
+        ref: 'Club'
     }
 }, {
     timestamps: true

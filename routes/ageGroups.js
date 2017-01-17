@@ -13,6 +13,7 @@ router.route('/')
 //GET all age groups
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     AgeGroup.find(req.query)
+        .sort({ name: -1 })
         .exec(function(err, groups) {
             if(err) throw err;
             res.json(groups);

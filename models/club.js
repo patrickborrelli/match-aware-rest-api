@@ -9,7 +9,8 @@ var Club = new Schema({
     short_name: {
         type: String,
         required: true
-    }
+    },
+    logo_url : String
 }, {
     timestamps: true
 });

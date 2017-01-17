@@ -15,6 +15,7 @@ router.route('/')
     Team.find({})
         .populate('gender')
         .populate('age_group')
+        .populate('club')
         .exec(function(err, teams) {
             if(err) throw err;
             res.json(teams);
@@ -47,6 +48,7 @@ router.route('/:teamId')
     Team.findById(req.params.teamId)
         .populate('gender')
         .populate('age_group')
+        .populate('club')
         .exec(function(err, team) {
             if(err) throw err;
             res.json(team);
@@ -68,6 +70,7 @@ router.route('/:teamId')
     Team.findById(req.params.teamId)
         .populate('gender')
         .populate('age_group')
+        .populate('club')
         .exec(function(err, team) {
             if(err) throw err;
             fullName = team.age_group.name + team.gender.short_name + " " + team.name;

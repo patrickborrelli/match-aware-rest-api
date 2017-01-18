@@ -13,6 +13,7 @@ router.route('/')
 //get all facilities:
 .get(function(req, res) {
     Facility.find({})
+        .populate('club_affiliation')
         .exec(function(err, facilities) {
             if(err) throw err;
             res.json(facilities);
@@ -43,6 +44,7 @@ router.route('/:facilityId')
 ///GET facility by ID
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     Facility.findById(req.params.facilityId)
+        .populate('club_affiliation')
         .exec(function(err, facility) {
             if(err) throw err;
             res.json(facility);

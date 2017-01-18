@@ -9,7 +9,6 @@ var Field = new Schema({
         type: String
     }, 
     facility: {
-        required: true,
         type: Schema.Types.ObjectId,
         ref: 'Facility'
     }, 

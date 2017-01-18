@@ -12,7 +12,7 @@ router.route('/')
 
 //get all fields:
 .get(function(req, res) {
-    Field.find({})
+    Field.find(req.query)
         .populate('facility')
         .populate('size')
         .exec(function(err, fields) {

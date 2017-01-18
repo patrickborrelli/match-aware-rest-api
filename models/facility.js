@@ -46,7 +46,8 @@ var Facility = new Schema({
     fri_start_time: String,
     fri_stop_time: String,
     sat_start_time: String,
-    sat_stop_time: String,    
+    sat_stop_time: String,  
+    google_maps_address: String,
     indoor: Boolean
 }, {
     timestamps: true

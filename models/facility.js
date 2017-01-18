@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var Field = require('./field.js');
 var Club = require('./club.js');
 
 var Facility = new Schema({
@@ -15,6 +16,10 @@ var Facility = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Club'
     },
+    fields: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Field'
+    }],
     address: {
         required: true,
         type: String

@@ -141,6 +141,66 @@ router.route('/addField/:facilityId/:fieldId')
             res.json(facility);
         }
     )
-})
+});
+
+
+//#################################################################################################
+//#################################################################################################
+router.route('/closeFields/:facilityId')
+
+///POST close all of this facility's fields based on the facility closure
+.post(Verify.verifyOrdinaryUser, function(req, res, next) {
+
+    async.waterfall(
+        [
+            function(callback) {
+                Facility.findById(req.params.facilityId)
+                    .populate('club_affiliation')
+                    .populate({ 
+                         path: 'fields',
+                         model: 'Field',
+                         populate: {
+                           path: 'size',
+                           model: 'FieldSize'
+                         }
+                      })
+                    .exec(function(err, facility) {
+                        if(err) throw err;
+                        callback(null, facility);
+                });  
+            },
+            function(facility, callback) {
+                var count = facility.fields.length;
+                var flds = facility.fields;
+                var newFields = [];
+                
+                console.log("will now update " + count + " fields");    
+                
+                async.forEach(flds, function(fld, callback) { 
+                    Field.findByIdAndUpdate(fld._id, 
+                            {$set: 
+                                {   
+                                    closure: facility.closure, 
+                                    closure_type: facility.closure_type,
+                                    close_start: facility.close_start,
+                                    close_end: facility.close_end
+                                }
+                             }, {new: true}) 
+                        .exec(function(err, field) {
+                            if(err) throw err;
+                            newFields.push(field);
+                            callback(); 
+                    });                
+                }, function(err) {
+                    if (err) return next(err);
+                    callback(null, newFields);
+                });
+            }
+        ],
+        function(err, facility) {
+            res.json(facility);
+        }
+    ) 
+});
 
 module.exports = router;

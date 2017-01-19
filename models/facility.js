@@ -53,6 +53,12 @@ var Facility = new Schema({
     sat_start_time: String,
     sat_stop_time: String,  
     google_maps_address: String,
+    closure: {
+        type: String,
+        enum: ['CURRENT', 'FUTURE']
+    },
+    close_start: Number,
+    close_end: Number,
     indoor: Boolean
 }, {
     timestamps: true

@@ -23,6 +23,12 @@ var Field = new Schema({
     practice: Boolean,
     tournament: Boolean,
     training: Boolean,
+    closure: {
+        type: String,
+        enum: ['CURRENT', 'FUTURE']
+    },
+    close_start: Number,
+    close_end: Number,
     surface: {
         type: String,
         enum: ['GRASS', 'TURF']

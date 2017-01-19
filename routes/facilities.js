@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var Facility = require('../models/facility');
 var Field = require('../models/field');
+var FieldSize = require('../models/fieldSize');
 var async = require('async');
 var Verify = require('./verify');
 
@@ -16,7 +17,14 @@ router.route('/')
 .get(function(req, res) {
     Facility.find({})
         .populate('club_affiliation')
-        .populate('fields')
+        .populate({ 
+             path: 'fields',
+             model: 'Field',
+             populate: {
+               path: 'size',
+               model: 'FieldSize'
+             }
+          })
         .exec(function(err, facilities) {
             if(err) throw err;
             res.json(facilities);
@@ -47,8 +55,15 @@ router.route('/:facilityId')
 ///GET facility by ID
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     Facility.findById(req.params.facilityId)
-        .populate('club_affiliation')    
-        .populate('fields')
+        .populate('club_affiliation')
+        .populate({ 
+             path: 'fields',
+             model: 'Field',
+             populate: {
+               path: 'size',
+               model: 'FieldSize'
+             }
+          })
         .exec(function(err, facility) {
             if(err) throw err;
             res.json(facility);
@@ -84,8 +99,15 @@ router.route('/addField/:facilityId/:fieldId')
         [
             function(callback) {
                 Facility.findById(req.params.facilityId)
-                    .populate('club_affiliation')                    
-                    .populate('fields')
+                    .populate('club_affiliation')
+                    .populate({ 
+                         path: 'fields',
+                         model: 'Field',
+                         populate: {
+                           path: 'size',
+                           model: 'FieldSize'
+                         }
+                      })
                     .exec(function(err, facility) {
                         if(err) throw err;
                         callback(null, facility);

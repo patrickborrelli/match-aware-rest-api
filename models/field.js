@@ -24,6 +24,10 @@ var Field = new Schema({
     tournament: Boolean,
     training: Boolean,
     closure: {
+        type: Boolean,
+        default: false
+    },
+    closure_type: {
         type: String,
         enum: ['CURRENT', 'FUTURE']
     },

@@ -54,6 +54,10 @@ var Facility = new Schema({
     sat_stop_time: String,  
     google_maps_address: String,
     closure: {
+        type: Boolean,
+        default: false
+    },
+    closure_type: {
         type: String,
         enum: ['CURRENT', 'FUTURE']
     },

@@ -146,15 +146,15 @@ router.route('/addField/:facilityId/:fieldId')
 
 //#################################################################################################
 //#################################################################################################
-router.route('/closeFields/:facilityId')
+router.route('/closeFacility/:facilityId')
 
-///POST close all of this facility's fields based on the facility closure
-.post(Verify.verifyOrdinaryUser, function(req, res, next) {
+///PUT close this facility and all of its fields based on the facility closure
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
 
     async.waterfall(
         [
             function(callback) {
-                Facility.findById(req.params.facilityId)
+                Facility.findByIdAndUpdate(req.params.facilityId, {$set: req.body}, {new: true})
                     .populate('club_affiliation')
                     .populate({ 
                          path: 'fields',
@@ -193,7 +193,76 @@ router.route('/closeFields/:facilityId')
                     });                
                 }, function(err) {
                     if (err) return next(err);
-                    callback(null, newFields);
+                    facility.fields = newFields;
+                    callback(null, facility);
+                });
+            }
+        ],
+        function(err, facility) {
+            res.json(facility);
+        }
+    ) 
+});
+
+
+//#################################################################################################
+//#################################################################################################
+router.route('/openFacility/:facilityId')
+
+///PUT open all of this facility's fields
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
+
+    async.waterfall(
+        [
+            function(callback) {
+                Facility.findByIdAndUpdate(req.params.facilityId, {$set: 
+                                {   
+                                    closure: false,
+                                    closure_type: "",
+                                    close_start: 0,
+                                    close_end: 0
+                                }
+                             }, {new: true}) 
+                    .populate('club_affiliation')
+                    .populate({ 
+                         path: 'fields',
+                         model: 'Field',
+                         populate: {
+                           path: 'size',
+                           model: 'FieldSize'
+                         }
+                      })
+                    .exec(function(err, facility) {
+                        if(err) throw err;
+                        callback(null, facility);
+                });  
+            },
+            function(facility, callback) {
+                var count = facility.fields.length;
+                var flds = facility.fields;
+                var newFields = [];
+                
+                console.log("will now update " + count + " fields");    
+                
+                async.forEach(flds, function(fld, callback) { 
+                    Field.findByIdAndUpdate(fld._id, 
+                            {$set: 
+                                {   
+                                    closure: false,
+                                    closure_type: "",
+                                    close_start: 0,
+                                    close_end: 0
+                                }
+                             }, {new: true}) 
+                        .exec(function(err, field) {
+                            if(err) throw err;
+                            newFields.push(field);
+                            callback(); 
+                    });                
+                }, function(err) {
+                    if (err) return next(err);                    
+                    facility.fields = newFields;
+                    callback(null, facility);
                 });
             }
         ],

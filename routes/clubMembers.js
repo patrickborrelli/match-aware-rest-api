@@ -63,7 +63,14 @@ router.route('/findClubAdmin/:clubId')
                         if(err) return next(err);
                         console.log("\n\nFound members: ");
                         console.log(members);
-                        callback(null, members);
+                        //build array of member IDs:
+                        var myMembers = [];
+                        for(var i = 0; i < members.length; i++) {
+                            myMembers.push(members[i].user._id);
+                        }
+                        console.log("Passing on array of ids:");
+                        console.log(myMembers);                    
+                        callback(null, myMembers);
                     });                
             },
             function(members, callback) {
@@ -79,10 +86,7 @@ router.route('/findClubAdmin/:clubId')
                 var adminUser = null;
                 console.log("\n\nPassed in members: ");
                 console.log(members);
-                var map = members.map(function(cm) {return cm.user._id });
-                console.log("\n\nBuilt map of member IDs as " );
-                console.log(map);
-                User.find({"_id": { "$in": map }}) 
+                User.find({"_id": { "$in": members }}) 
                     .exec(function(err, users) {
                         if(err) return next(err);
                         for(var i = 0; i < users.length; i++) {

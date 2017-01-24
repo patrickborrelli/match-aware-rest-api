@@ -61,19 +61,26 @@ router.route('/findClubAdmin/:clubId')
                     .populate('user')
                     .exec(function(err, members) {
                         if(err) return next(err);
+                        console.log("\n\nFound members: ");
+                        console.log(members);
                         callback(null, members);
                     });                
             },
             function(members, callback) {
                 Role.findOne({"name": "CLUB_ADMIN"})
                     .exec(function(err, role) {
-                        if(err) return next(err);
+                        if(err) return next(err);                    
+                        console.log("\n\nFound role ID: ");
+                        console.log(role);
                         callback(null, members, role._id);
                 });
             },
             function(members, roleId, callback) {
                 var adminUser = null;
-                User.find({"_id": { "$in": members.map(function(cm) {return cm.user._id })}}) 
+                var map = members.map(function(cm) {return cm.user._id });
+                console.log("\n\nBuilt map of member IDs as " );
+                console.log(map);
+                User.find({"_id": { "$in": map }}) 
                     .exec(function(err, users) {
                         if(err) return next(err);
                         for(var i = 0; i < users.length; i++) {

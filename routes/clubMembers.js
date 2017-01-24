@@ -77,6 +77,8 @@ router.route('/findClubAdmin/:clubId')
             },
             function(members, roleId, callback) {
                 var adminUser = null;
+                console.log("\n\nPassed in members: ");
+                console.log(members);
                 var map = members.map(function(cm) {return cm.user._id });
                 console.log("\n\nBuilt map of member IDs as " );
                 console.log(map);

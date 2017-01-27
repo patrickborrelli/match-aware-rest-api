@@ -13,6 +13,7 @@ router.route('/')
 //GET all clubs
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     Club.find(req.query)
+        .sort({ name: -1 })
         .exec(function(err, clubs) {
             if(err) throw err;
             res.json(clubs);

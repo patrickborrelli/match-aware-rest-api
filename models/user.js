@@ -2,29 +2,35 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Certification = require('./certification.js');
 var License = require('./license.js');
-var Role = require('./role.js');
+var ClubRole = require('./clubRole.js');
 var passportLocalMongoose = require('passport-local-mongoose');
 
 var User = new Schema({
     username: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
+        unique: true
     },
-    password: String,
-    roles: [{
+    password: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    club_roles: [{
         type: Schema.Types.ObjectId,
-        ref: 'Role'
+        ref: 'ClubRole'
     }],
-    OauthId: String,
-    OauthToken: String,
     first_name: {
         type: String,
         default: '',
+        trim: true,
         required: true
     },
     last_name: {
         type: String,
         default: '',
+        trim: true,
         required: true
     },
     mobile: {
@@ -33,17 +39,33 @@ var User = new Schema({
     },
     email_address: {
         type: String,
+        trim: true,
         required: true
     },
-    profile_image: {
+    profile_image_url: {
         type: String,
         default: './images/defaultUser.png'
     },
-    address: String,
-    city: String,
-    state: String,
-    country: String,
-    postal_code: String,
+    address: {
+        type: String,
+        trim: true
+    },
+    city: {
+        type: String,
+        trim: true
+    },
+    state: {
+        type: String,
+        trim: true
+    },
+    country: {
+        type: String,
+        trim: true
+    },
+    postal_code: {
+        type: String,
+        trim: true
+    },
     certifications: [{
         type: Schema.Types.ObjectId,
         ref: 'Certification'
@@ -51,7 +73,9 @@ var User = new Schema({
     licenses: [{
         type: Schema.Types.ObjectId,
         ref: 'License'
-    }]
+    }],
+    OauthId: String,
+    OauthToken: String,
 }, {
     timestamps: true
 });

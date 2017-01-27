@@ -12,11 +12,11 @@ router.route('/')
 
 //get all leagues:
 .get(function(req, res) {
-    League.find({})
+    League.find(req.query)            
+        .sort({ name: -1 })
         .populate('min_age_group')
         .populate('max_age_group')
         .populate('type')
-        .populate('reschedule_rule')
         .exec(function(err, leagues) {
             if(err) throw err;
             res.json(leagues);
@@ -47,6 +47,9 @@ router.route('/:leagueId')
 ///GET league by ID
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     League.findById(req.params.leagueId)
+        .populate('min_age_group')
+        .populate('max_age_group')
+        .populate('type')
         .exec(function(err, league) {
             if(err) throw err;
             res.json(league);
@@ -56,6 +59,9 @@ router.route('/:leagueId')
 //PUT update league by ID
 .put(Verify.verifyOrdinaryUser, function(req, res) {
     League.findByIdAndUpdate(req.params.leagueId, {$set: req.body}, {new: true}) 
+        .populate('min_age_group')
+        .populate('max_age_group')
+        .populate('type')
         .exec(function(err, league) {
             if(err) throw err;
             res.json(league);

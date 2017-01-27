@@ -1,17 +1,19 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var AgeGroup = require('./ageGroup.js');
-var RescheduleRule = require('./rescheduleRule.js');
 var LeagueType = require('./leagueType.js');
 
 var League = new Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
+        unique: true
     },
     short_name: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     min_age_group: {
         type: Schema.Types.ObjectId,
@@ -26,9 +28,18 @@ var League = new Schema({
         ref: 'LeagueType',
         required: true
     },
-    reschedule_rule: {
-        type: Schema.Types.ObjectId,
-        ref: 'RescheduleRule'
+    reschedule_time: {
+        required: true,
+        type: Number,
+        default: 0
+    },
+    reschedule_consequence: {
+        type: String,
+        enum: ['FORFEIT', 'FINE', 'FORFEIT_FINE']
+    },
+    reschedule_fine: {
+        type: Number,
+        default: 0
     },
     logo_url: {
         type: String,

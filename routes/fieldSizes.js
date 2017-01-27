@@ -12,7 +12,8 @@ router.route('/')
 
 //GET all field sizes
 .get(Verify.verifyOrdinaryUser, function(req, res) {
-    FieldSize.find(req.query)
+    FieldSize.find(req.query)            
+        .sort({ name: -1 })
         .exec(function(err, sizes) {
             if(err) throw err;
             res.json(sizes);

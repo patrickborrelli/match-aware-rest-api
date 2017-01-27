@@ -9,7 +9,6 @@ var Message = new Schema({
         ref: 'Event'
     },
     text: String,
-    created_date: Number,
     sender: {
         type: Schema.Types.ObjectId,
         ref: 'User'

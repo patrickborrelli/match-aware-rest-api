@@ -13,6 +13,7 @@ router.route('/')
 //GET all league types
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     LeagueType.find(req.query)
+        .sort({ name: -1 })
         .exec(function(err, types) {
             if(err) throw err;
             res.json(types);

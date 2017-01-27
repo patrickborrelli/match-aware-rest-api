@@ -23,9 +23,6 @@ router.route('/')
 
 //add a new rule to the system:  
 .post(Verify.verifyOrdinaryUser, function(req, res, next) {
-    console.log("Decoded id = " + req.decoded._id);
-    req.body.created_by = req.decoded._id;
-    console.log("Retrieved req.body.created_by: " + req.body.created_by);
     Rule.create(req.body, function(err, rule) {
         if(err) return next(err);
         console.log("New rule created");

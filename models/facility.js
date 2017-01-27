@@ -2,15 +2,19 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Field = require('./field.js');
 var Club = require('./club.js');
+var Closure = require('./closure.js');
 
 var Facility = new Schema({
     name: {
         required: true,
-        type: String
+        type: String,
+        trim: true,
+        unique: true
     }, 
     short_name: {
         required: true,
-        type: String
+        type: String,
+        trim: true
     }, 
     club_affiliation: {
         type: Schema.Types.ObjectId,
@@ -22,19 +26,23 @@ var Facility = new Schema({
     }],
     address: {
         required: true,
-        type: String
+        type: String,
+        trim: true
     }, 
     city: {
         required: true,
-        type: String
+        type: String,
+        trim: true
     }, 
     state: {
         required: true,
-        type: String
+        type: String,
+        trim: true
     }, 
     postal_code: {
         required: true,
-        type: String
+        type: String,
+        trim: true
     }, 
     latitude: Number,
     longitude: Number,
@@ -53,17 +61,11 @@ var Facility = new Schema({
     sat_start_time: String,
     sat_stop_time: String,  
     google_maps_address: String,
-    closure: {
-        type: Boolean,
-        default: false
-    },
-    closure_type: {
-        type: String,
-        enum: ['CURRENT', 'FUTURE']
-    },
-    close_start: Number,
-    close_end: Number,
-    indoor: Boolean
+    indoor: Boolean,
+    closures: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Closure'
+    }]
 }, {
     timestamps: true
 });

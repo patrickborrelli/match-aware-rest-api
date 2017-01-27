@@ -15,7 +15,8 @@ router.route('/')
 
 //get all facilities:
 .get(function(req, res) {
-    Facility.find({})
+    Facility.find(req.query)
+        .sort({ name: -1 })
         .populate('club_affiliation')
         .populate({ 
              path: 'fields',
@@ -25,6 +26,7 @@ router.route('/')
                model: 'FieldSize'
              }
           })
+        .populate('closures')
         .exec(function(err, facilities) {
             if(err) throw err;
             res.json(facilities);
@@ -64,6 +66,7 @@ router.route('/:facilityId')
                model: 'FieldSize'
              }
           })
+        .populate('closures')
         .exec(function(err, facility) {
             if(err) throw err;
             res.json(facility);
@@ -108,6 +111,7 @@ router.route('/addField/:facilityId/:fieldId')
                            model: 'FieldSize'
                          }
                       })
+                    .populate('closures')
                     .exec(function(err, facility) {
                         if(err) throw err;
                         callback(null, facility);
@@ -164,6 +168,7 @@ router.route('/closeFacility/:facilityId')
                            model: 'FieldSize'
                          }
                       })
+                    .populate('closures')
                     .exec(function(err, facility) {
                         if(err) throw err;
                         callback(null, facility);
@@ -222,7 +227,7 @@ router.route('/openFacility/:facilityId')
                                     close_start: 0,
                                     close_end: 0
                                 }
-                             }, {new: true}) 
+                             }, {new: true})   
                     .populate('club_affiliation')
                     .populate({ 
                          path: 'fields',
@@ -232,6 +237,7 @@ router.route('/openFacility/:facilityId')
                            model: 'FieldSize'
                          }
                       })
+                    .populate('closures')
                     .exec(function(err, facility) {
                         if(err) throw err;
                         callback(null, facility);

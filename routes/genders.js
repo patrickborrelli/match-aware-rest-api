@@ -12,7 +12,8 @@ router.route('/')
 
 //get all genders:
 .get(function(req, res) {
-    Gender.find({})
+    Gender.find({})                
+        .sort({ name: -1 })
         .exec(function(err, genders) {
             if(err) throw err;
             res.json(genders);

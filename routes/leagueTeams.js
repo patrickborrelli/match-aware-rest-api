@@ -15,9 +15,10 @@ router.route('/')
 
 //GET all league teams:
 .get(function(req, res) {
-    LeagueTeam.find({})
+    LeagueTeam.find(req.query)
         .populate('team')
         .populate('league')
+        .populate('added_by')
         .exec(function(err, leagueTeams) {
             if(err) throw err;
             res.json(leagueTeams);
@@ -72,6 +73,7 @@ router.route('/findLeagueTeams/:leagueId')
                 LeagueTeam.find({league: req.params.leagueId})
                     .populate('team')
                     .populate('league')
+                    .populate('added_by')
                     .exec(function(err, leaguesTeams) {
                         if(err) return next(err);
                         console.log("Found " + leaguesTeams.length + " teams in this league.");
@@ -109,6 +111,7 @@ router.route('/findTeamsLeagues/:teamId')
                 LeagueTeam.find({team: req.params.teamId})
                     .populate('team')
                     .populate('league')
+                    .populate('added_by')
                     .exec(function(err, leagueTeams) {
                         if(err) return next(err);
                         console.log("Found " + leagueTeams.length + " leagues for team.");

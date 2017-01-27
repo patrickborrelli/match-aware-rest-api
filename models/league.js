@@ -32,7 +32,7 @@ var League = new Schema({
     },
     logo_url: {
         type: String,
-        default: './images/noLogo.png'
+        default: './images/no-logo.png'
     }
 }, {
     timestamps: true

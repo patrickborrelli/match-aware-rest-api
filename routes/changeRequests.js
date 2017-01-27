@@ -12,11 +12,12 @@ router.route('/')
 
 //get all change requests:
 .get(function(req, res) {
-    ChangeRequest.find({})
+    ChangeRequest.find(req.query)
         .populate('original_event')
         .populate('changed_event')
         .populate('approver')
         .populate('submitter')
+        .populate('messages')
         .exec(function(err, changeRequests) {
             if(err) throw err;
             res.json(changeRequests);
@@ -52,6 +53,7 @@ router.route('/:changeRequestId')
         .populate('changed_event')
         .populate('approver')
         .populate('submitter')
+        .populate('messages')
         .exec(function(err, changeRequest) {
             if(err) throw err;
             res.json(changeRequest);
@@ -89,6 +91,7 @@ router.route('/findByApprover/:userId')
         .populate('changed_event')
         .populate('approver')
         .populate('submitter')
+        .populate('messages')
         .exec(function(err, changeRequests) {
             if(err) throw err;
             res.json(changeRequests);
@@ -107,6 +110,7 @@ router.route('/findBySubmitter/:userId')
         .populate('changed_event')
         .populate('approver')
         .populate('submitter')
+        .populate('messages')
         .exec(function(err, changeRequests) {
             if(err) throw err;
             res.json(changeRequests);

@@ -2,11 +2,14 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Facility = require('./facility.js');
 var FieldSize = require('./fieldSize.js');
+var Closure = require('./closure.js');
 
 var Field = new Schema({
     name: {
         required: true,
-        type: String
+        type: String,
+        trim: true,
+        unique: true
     }, 
     facility: {
         type: Schema.Types.ObjectId,
@@ -17,22 +20,33 @@ var Field = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'FieldSize'
     }, 
-    lights: Boolean,
-    condition: Number,
-    game: Boolean, 
-    practice: Boolean,
-    tournament: Boolean,
-    training: Boolean,
-    closure: {
+    lights: {
         type: Boolean,
         default: false
     },
-    closure_type: {
-        type: String,
-        enum: ['CURRENT', 'FUTURE']
+    condition: {
+        type: Number
     },
-    close_start: Number,
-    close_end: Number,
+    game: {
+        type: Boolean,
+        default: true
+    }, 
+    practice: {
+        type: Boolean,
+        default: false
+    },
+    tournament: {
+        type: Boolean,
+        default: false
+    },
+    training: {
+        type: Boolean,
+        default: false
+    },
+    closures: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Closure'
+    }],
     surface: {
         type: String,
         enum: ['GRASS', 'TURF']

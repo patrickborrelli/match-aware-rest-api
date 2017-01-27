@@ -12,9 +12,11 @@ router.route('/')
 
 //get all fields:
 .get(function(req, res) {
-    Field.find(req.query)
+    Field.find(req.query)        
+        .sort({ name: -1 })
         .populate('facility')
         .populate('size')
+        .populate('closures')
         .exec(function(err, fields) {
             if(err) throw err;
             res.json(fields);
@@ -47,6 +49,7 @@ router.route('/:fieldId')
     Field.findById(req.params.fieldId)
         .populate('facility')
         .populate('size')
+        .populate('closures')
         .exec(function(err, field) {
             if(err) throw err;
             res.json(field);

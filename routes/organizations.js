@@ -13,6 +13,7 @@ router.route('/')
 //GET all organizations
 .get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Organization.find(req.query)
+        .sort({ name: -1 })
         .populate('administrator')
         .populate('club_affiliation')
         .populate('staff')

@@ -12,7 +12,7 @@ router.route('/')
 
 //get all user invites:
 .get(function(req, res) {
-    UserInvite.find({})
+    UserInvite.find(req.query)
         .populate('role')
         .exec(function(err, userInvites) {
             if(err) throw err;

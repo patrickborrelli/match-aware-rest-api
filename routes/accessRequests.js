@@ -3,6 +3,9 @@ var bodyParser = require('body-parser');
 var AccessRequest = require('../models/accessRequest');
 var Verify = require('./verify');
 var Role = require('../models/role.js');
+var ClubRole = require('../models/clubRole.js');
+var Certification = require('../models/certification.js');
+var License = require('../models/license.js');
 
 var router = express.Router();
 router.use(bodyParser.json());
@@ -15,17 +18,26 @@ router.route('/')
 .get(function(req, res) {
     AccessRequest.find(req.query)
         .populate({ 
-             path: 'user',
-             model: 'User',
-             populate: {
-               path: 'roles',
-               model: 'Role'
-             }
+            path: 'user',
+            model: 'User',
+            populate: {
+                path: 'club_roles',
+                model: 'ClubRole'
+            },
+            populate: {
+                path: 'certifications',
+                model: 'Certification'
+            },
+            populate: {
+                path: 'licenses',
+                model: 'License'
+            }
           })
         .populate('club')
         .populate('role')
         .populate('team')
         .populate('approver')
+        .populate('messages')
         .exec(function(err, accessRequests) {
             if(err) throw err;
             res.json(accessRequests);
@@ -57,17 +69,26 @@ router.route('/:accessRequestId')
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     AccessRequest.findById(req.params.accessRequestId)        
         .populate({ 
-             path: 'user',
-             model: 'User',
-             populate: {
-               path: 'roles',
-               model: 'Role'
-             }
+            path: 'user',
+            model: 'User',
+            populate: {
+                path: 'club_roles',
+                model: 'ClubRole'
+            },
+            populate: {
+                path: 'certifications',
+                model: 'Certification'
+            },
+            populate: {
+                path: 'licenses',
+                model: 'License'
+            }
           })
         .populate('club')
         .populate('role')
         .populate('team')
-        .populate('owner')
+        .populate('approver')
+        .populate('messages')
         .exec(function(err, accessRequest) {
             if(err) throw err;
             res.json(accessRequest);
@@ -87,14 +108,7 @@ router.route('/:accessRequestId')
 .delete(Verify.verifyOrdinaryUser, function(req, res) {
     var accessRequestName;
     AccessRequest.findById(req.params.accessRequestId)               
-        .populate({ 
-             path: 'user',
-             model: 'User',
-             populate: {
-               path: 'roles',
-               model: 'Role'
-             }
-          })
+        .populate('user')
         .populate('club')
         .populate('role')
         .populate('team')
@@ -128,17 +142,26 @@ router.route('/findByApprover/:userId')
                             ]
                        })      
         .populate({ 
-             path: 'user',
-             model: 'User',
-             populate: {
-               path: 'roles',
-               model: 'Role'
-             }
+            path: 'user',
+            model: 'User',
+            populate: {
+                path: 'club_roles',
+                model: 'ClubRole'
+            },
+            populate: {
+                path: 'certifications',
+                model: 'Certification'
+            },
+            populate: {
+                path: 'licenses',
+                model: 'License'
+            }
           })
         .populate('club')
         .populate('role')
         .populate('team')
         .populate('approver')
+        .populate('messages')
         .exec(function(err, accessRequests) {
             if(err) throw err;
             res.json(accessRequests);
@@ -154,17 +177,26 @@ router.route('/findByStatus/:status')
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     AccessRequest.find({status: req.params.status})        
         .populate({ 
-             path: 'user',
-             model: 'User',
-             populate: {
-               path: 'roles',
-               model: 'Role'
-             }
+            path: 'user',
+            model: 'User',
+            populate: {
+                path: 'club_roles',
+                model: 'ClubRole'
+            },
+            populate: {
+                path: 'certifications',
+                model: 'Certification'
+            },
+            populate: {
+                path: 'licenses',
+                model: 'License'
+            }
           })
         .populate('club')
         .populate('role')
         .populate('team')
         .populate('approver')
+        .populate('messages')
         .exec(function(err, accessRequests) {
             if(err) throw err;
             res.json(accessRequests);

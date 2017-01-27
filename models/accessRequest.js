@@ -4,6 +4,7 @@ var User = require('./user.js');
 var Club = require('./club.js');
 var Role = require('./role.js');
 var Team = require('./team.js');
+var Message = require('./message.js');
 
 var AccessRequest = new Schema({
     user: {
@@ -33,7 +34,11 @@ var AccessRequest = new Schema({
     status: {
         type: String,
         enum: ['SENT', 'PENDING', 'ACCEPTED', 'REJECTED']
-    }    
+    },
+    messages: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Message'
+    }]
 }, {
     timestamps: true
 });

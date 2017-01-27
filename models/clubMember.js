@@ -6,11 +6,13 @@ var Club = require('./club.js');
 var ClubMember = new Schema({
     club: {
         type: Schema.Types.ObjectId,
-        ref: 'Club'
+        ref: 'Club',
+        required: true
     },
     user: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     }
 }, {
     timestamps: true

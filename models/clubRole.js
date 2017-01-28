@@ -15,6 +15,11 @@ var ClubRole = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Role'
     },
+    member: {
+        required: true,
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
     added_by: {
         type: Schema.Types.ObjectId,
         ref: 'User'

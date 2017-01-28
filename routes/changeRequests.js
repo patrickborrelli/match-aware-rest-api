@@ -11,7 +11,7 @@ router.use(bodyParser.json());
 router.route('/')
 
 //get all change requests:
-.get(function(req, res) {
+.get(function(req, res, next) {
     ChangeRequest.find(req.query)
         .populate('original_event')
         .populate('changed_event')
@@ -47,7 +47,7 @@ router.route('/')
 router.route('/:changeRequestId')
 
 ///GET change request by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     ChangeRequest.findById(req.params.changeRequestId)
         .populate('original_event')
         .populate('changed_event')
@@ -61,7 +61,7 @@ router.route('/:changeRequestId')
 })
 
 //PUT update change request by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     ChangeRequest.findByIdAndUpdate(req.params.changeRequestId, {$set: req.body}, {new: true}) 
         .exec(function(err, changeRequest) {
             if(err) throw err;
@@ -70,7 +70,7 @@ router.route('/:changeRequestId')
 })
 
 ///DELETE change request by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     ChangeRequest.findById(req.params.changeRequestId)
         .exec(function(err, changeRequest) {
             if(err) throw err;
@@ -85,7 +85,7 @@ router.route('/:changeRequestId')
 router.route('/findByApprover/:userId')
 
 ///GET change request by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     ChangeRequest.find({approver: req.params.userId})
         .populate('original_event')
         .populate('changed_event')
@@ -104,7 +104,7 @@ router.route('/findByApprover/:userId')
 router.route('/findBySubmitter/:userId')
 
 ///GET change request by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     ChangeRequest.find({submitter: req.params.userId})
         .populate('original_event')
         .populate('changed_event')

@@ -14,9 +14,9 @@ router.use(bodyParser.json());
 router.route('/')
 
 //get all facilities:
-.get(function(req, res) {
+.get(function(req, res, next) {
     Facility.find(req.query)
-        .sort({ name: -1 })
+        .sort({ name: 'asc' })
         .populate('club_affiliation')
         .populate({ 
              path: 'fields',
@@ -55,7 +55,7 @@ router.route('/')
 router.route('/:facilityId')
 
 ///GET facility by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Facility.findById(req.params.facilityId)
         .populate('club_affiliation')
         .populate({ 
@@ -74,7 +74,7 @@ router.route('/:facilityId')
 })
 
 //PUT update facility by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     Facility.findByIdAndUpdate(req.params.facilityId, {$set: req.body}, {new: true}) 
         .exec(function(err, facility) {
             if(err) throw err;
@@ -83,7 +83,7 @@ router.route('/:facilityId')
 })
 
 ///DELETE facility by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     Facility.findById(req.params.facilityId)
         .exec(function(err, facility) {
             if(err) throw err;
@@ -96,8 +96,8 @@ router.route('/:facilityId')
 //#################################################################################################
 router.route('/addField/:facilityId/:fieldId')
 
-///POST add a field to a facility by ID
-.post(Verify.verifyOrdinaryUser, function(req, res, next) {
+///PUT add a field to a facility by ID
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     async.waterfall(
         [
             function(callback) {
@@ -150,7 +150,7 @@ router.route('/addField/:facilityId/:fieldId')
 
 //#################################################################################################
 //#################################################################################################
-router.route('/closeFacility/:facilityId')
+router.route('/closeFacility/:facilityId/:closureId')
 
 ///PUT close this facility and all of its fields based on the facility closure
 .put(Verify.verifyOrdinaryUser, function(req, res, next) {
@@ -158,7 +158,7 @@ router.route('/closeFacility/:facilityId')
     async.waterfall(
         [
             function(callback) {
-                Facility.findByIdAndUpdate(req.params.facilityId, {$set: req.body}, {new: true})
+                Facility.findById(req.params.facilityId)
                     .populate('club_affiliation')
                     .populate({ 
                          path: 'fields',
@@ -182,25 +182,92 @@ router.route('/closeFacility/:facilityId')
                 console.log("will now update " + count + " fields");    
                 
                 async.forEach(flds, function(fld, callback) { 
-                    Field.findByIdAndUpdate(fld._id, 
-                            {$set: 
-                                {   
-                                    closure: facility.closure, 
-                                    closure_type: facility.closure_type,
-                                    close_start: facility.close_start,
-                                    close_end: facility.close_end
-                                }
-                             }, {new: true}) 
+                    Field.findById(fld._id) 
                         .exec(function(err, field) {
                             if(err) throw err;
-                            newFields.push(field);
-                            callback(); 
+                            field.closures.push(req.params.closureId);
+                            field.save(function(err, field) {
+                                if(err) return next(err);
+                                newFields.push(field);
+                                callback();
+                            });                             
                     });                
                 }, function(err) {
                     if (err) return next(err);
                     facility.fields = newFields;
                     callback(null, facility);
                 });
+            }, 
+            function(facility, callback) {
+                facility.closures.push(req.params.closureId);
+                facility.save(function(err, facility) {
+                    if(err) return next(err);
+                    callback(null, facility);
+                })
+            }
+        ],
+        function(err, facility) {
+            res.json(facility);
+        }
+    ) 
+});
+
+//#################################################################################################
+//#################################################################################################
+router.route('/deleteAllClosures/:facilityId')
+
+///PUT remove all closures for this facility and all of its fields
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
+
+    async.waterfall(
+        [
+            function(callback) {
+                Facility.findById(req.params.facilityId)
+                    .populate('club_affiliation')
+                    .populate({ 
+                         path: 'fields',
+                         model: 'Field',
+                         populate: {
+                           path: 'size',
+                           model: 'FieldSize'
+                         }
+                      })
+                    .populate('closures')
+                    .exec(function(err, facility) {
+                        if(err) throw err;
+                        callback(null, facility);
+                });  
+            },
+            function(facility, callback) {
+                var count = facility.fields.length;
+                var flds = facility.fields;
+                var newFields = [];
+                
+                console.log("will now update " + count + " fields");    
+                
+                async.forEach(flds, function(fld, callback) { 
+                    Field.findById(fld._id) 
+                        .exec(function(err, field) {
+                            if(err) throw err;
+                            field.closures = [];
+                            field.save(function(err, field) {
+                                if(err) return next(err);
+                                newFields.push(field);
+                                callback();
+                            });                             
+                    });                
+                }, function(err) {
+                    if (err) return next(err);
+                    facility.fields = newFields;
+                    callback(null, facility);
+                });
+            }, 
+            function(facility, callback) {
+                facility.closures = [];
+                facility.save(function(err, facility) {
+                    if(err) return next(err);
+                    callback(null, facility);
+                })
             }
         ],
         function(err, facility) {
@@ -216,18 +283,12 @@ router.route('/openFacility/:facilityId')
 
 ///PUT open all of this facility's fields
 .put(Verify.verifyOrdinaryUser, function(req, res, next) {
-
+    //first, get all closures for this facility, find any that have a start time less than current and an end time greater than current.
+    //if so, change end time to current.
     async.waterfall(
         [
             function(callback) {
-                Facility.findByIdAndUpdate(req.params.facilityId, {$set: 
-                                {   
-                                    closure: false,
-                                    closure_type: "",
-                                    close_start: 0,
-                                    close_end: 0
-                                }
-                             }, {new: true})   
+                Facility.findById(req.params.facilityId)
                     .populate('club_affiliation')
                     .populate({ 
                          path: 'fields',
@@ -240,10 +301,21 @@ router.route('/openFacility/:facilityId')
                     .populate('closures')
                     .exec(function(err, facility) {
                         if(err) throw err;
+                        var now = new Date().getTime();
+                        //iterate through any closures, find any that are current, and change their end time to current time
+                        console.log("Facility has " + facility.closures.length + " closures");
+                        for(var i = 0; i < facility.closures.length; i++) {
+                            console.log("for first closure, comparing start time of " + facility.closures[i].start + " and end time of " + facility.closures[i].end + " with current time: " + now);
+                            if(facility.closures[i].start < now && facility.closures[i].end > now) {
+                                console.log("Closure is current, changing end time from " + facility.closures[i].end + " to " + now);
+                                facility.closures[i].end = now;
+                            }
+                        }
                         callback(null, facility);
                 });  
             },
             function(facility, callback) {
+                //now grab all fields for the facility and do the same:
                 var count = facility.fields.length;
                 var flds = facility.fields;
                 var newFields = [];
@@ -251,31 +323,42 @@ router.route('/openFacility/:facilityId')
                 console.log("will now update " + count + " fields");    
                 
                 async.forEach(flds, function(fld, callback) { 
-                    Field.findByIdAndUpdate(fld._id, 
-                            {$set: 
-                                {   
-                                    closure: false,
-                                    closure_type: "",
-                                    close_start: 0,
-                                    close_end: 0
-                                }
-                             }, {new: true}) 
+                    Field.findById(fld._id) 
                         .exec(function(err, field) {
                             if(err) throw err;
-                            newFields.push(field);
-                            callback(); 
+                            var now = new Date().getTime();
+                            //iterate through any closures, find any that are current, and change their end time to current time
+                            console.log("Field has " + field.closures.length + " closures");
+                            for(var i = 0; i < field.closures.length; i++) {
+                                console.log("for first closure, comparing start time of " + field.closures[i].start + " and end time of " + field.closures[i].end + " with current time: " + now);
+                                if(field.closures[i].start < now && field.closures[i].end > now) {
+                                    console.log("Closure is current, changing end time from " + field.closures[i].end + " to " + now);
+                                    field.closures[i].end = now;
+                                }
+                            }      
+                            field.save(function(err, field) {
+                                if(err) return next(err);
+                                newFields.push(field);
+                                callback();
+                            });                             
                     });                
                 }, function(err) {
-                    if (err) return next(err);                    
+                    if (err) return next(err);
                     facility.fields = newFields;
                     callback(null, facility);
-                });
+                });                
+            }, 
+            function(facility, callback) {
+                facility.save(function(err, facility) {
+                    if(err) return next(err);
+                    callback(null, facility);
+                })
             }
         ],
         function(err, facility) {
             res.json(facility);
         }
-    ) 
+    )     
 });
 
 module.exports = router;

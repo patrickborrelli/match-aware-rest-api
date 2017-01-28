@@ -11,9 +11,9 @@ router.use(bodyParser.json());
 router.route('/')
 
 //GET all clubs
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Club.find(req.query)
-        .sort({ name: -1 })
+        .sort({ name: 'asc' })
         .exec(function(err, clubs) {
             if(err) throw err;
             res.json(clubs);
@@ -21,7 +21,7 @@ router.route('/')
 })
 
 //POST add club
-.post(Verify.verifyOrdinaryUser, function(req, res) {
+.post(Verify.verifyOrdinaryUser, function(req, res, next) {
     Club.create(req.body, function(err, club) {
         if(err) return next(err);
         console.log("New club created");
@@ -30,7 +30,7 @@ router.route('/')
 })
 
 //DELETE all clubs
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     Club.find({}, function(err, clubs) {
         if(err) return next(err);
         console.log("Removing all clubs from system.");
@@ -48,7 +48,7 @@ router.route('/')
 router.route('/:clubId')
 
 ///GET club by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Club.findById(req.params.clubId)
         .exec(function(err, club) {
             if(err) throw err;
@@ -57,7 +57,7 @@ router.route('/:clubId')
 })
 
 //PUT update club by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     Club.findByIdAndUpdate(req.params.clubId, {$set: req.body}, {new: true}) 
         .exec(function(err, club) {
             if(err) throw err;
@@ -66,7 +66,7 @@ router.route('/:clubId')
 })
 
 ///DELETE club by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     Club.findById(req.params.clubId)
         .exec(function(err, club) {
             if(err) throw err;

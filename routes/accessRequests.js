@@ -15,7 +15,7 @@ router.use(bodyParser.json());
 router.route('/')
 
 //get all access requests:
-.get(function(req, res) {
+.get(function(req, res, next) {
     AccessRequest.find(req.query)
         .populate({ 
             path: 'user',
@@ -66,7 +66,7 @@ router.route('/')
 router.route('/:accessRequestId')
 
 ///GET access request by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     AccessRequest.findById(req.params.accessRequestId)        
         .populate({ 
             path: 'user',
@@ -96,7 +96,7 @@ router.route('/:accessRequestId')
 })
 
 //PUT update access request by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     AccessRequest.findByIdAndUpdate(req.params.accessRequestId, {$set: req.body}, {new: true}) 
         .exec(function(err, accessRequest) {
             if(err) throw err;
@@ -105,7 +105,7 @@ router.route('/:accessRequestId')
 })
 
 ///DELETE access request by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     var accessRequestName;
     AccessRequest.findById(req.params.accessRequestId)               
         .populate('user')
@@ -134,7 +134,7 @@ router.route('/:accessRequestId')
 router.route('/findByApprover/:userId')
 
 ///GET all access requests pending review by this user
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     AccessRequest.find({$and: 
                             [
                                   { $or: [{status: "PENDING"}, {status: "SENT"}] },
@@ -174,7 +174,7 @@ router.route('/findByApprover/:userId')
 router.route('/findByStatus/:status')
 
 ///GET all access requests with the provided status
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     AccessRequest.find({status: req.params.status})        
         .populate({ 
             path: 'user',

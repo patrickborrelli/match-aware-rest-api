@@ -11,9 +11,9 @@ router.use(bodyParser.json());
 router.route('/')
 
 //get all roles:
-.get(function(req, res) {
+.get(function(req, res, next) {
     Role.find(req.query)
-        .sort({ name: -1 })
+        .sort({ name: 'asc' })
         .populate('created_by')
         .exec(function(err, roles) {
             if(err) throw err;
@@ -46,7 +46,7 @@ router.route('/')
 router.route('/:roleId')
 
 ///GET role by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Role.findById(req.params.roleId)
         .exec(function(err, role) {
             if(err) throw err;
@@ -55,7 +55,7 @@ router.route('/:roleId')
 })
 
 //PUT update role by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     Role.findByIdAndUpdate(req.params.roleId, {$set: req.body}, {new: true}) 
         .exec(function(err, role) {
             if(err) throw err;
@@ -64,7 +64,7 @@ router.route('/:roleId')
 })
 
 ///DELETE role by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     Role.findById(req.params.roleId)
         .exec(function(err, role) {
             if(err) throw err;

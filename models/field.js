@@ -25,7 +25,8 @@ var Field = new Schema({
         default: false
     },
     condition: {
-        type: Number
+        type: Number,
+        default: 6
     },
     game: {
         type: Boolean,

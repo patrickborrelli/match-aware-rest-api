@@ -24,12 +24,11 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var roles = require('./routes/roles');
 var clubs = require('./routes/clubs');
-var club_members = require('./routes/clubMembers');
+var club_roles = require('./routes/clubRoles');
 var age_groups = require('./routes/ageGroups');
 var event_types = require('./routes/eventTypes');
 var field_sizes = require('./routes/fieldSizes');
 var league_types = require('./routes/leagueTypes');
-var reschedule_rules = require('./routes/rescheduleRules');
 var leagues = require('./routes/leagues');
 var rules = require('./routes/rules');
 var genders = require('./routes/genders');
@@ -47,6 +46,7 @@ var change_requests = require('./routes/changeRequests');
 var messages = require('./routes/messages');
 var notifications = require('./routes/notifications');
 var field_availabilities = require('./routes/fieldAvailabilities');
+var closures = require('./routes/closures');
 
 var app = express();
 
@@ -74,12 +74,11 @@ app.use('/', routes);
 app.use('/users', users);
 app.use('/roles', roles);
 app.use('/clubs', clubs);
-app.use('/club_members', club_members);
+app.use('/club_roles', club_roles);
 app.use('/age_groups', age_groups);
 app.use('/event_types', event_types);
 app.use('/field_sizes', field_sizes);
 app.use('/league_types', league_types);
-app.use('/reschedule_rules', reschedule_rules);
 app.use('/leagues', leagues);
 app.use('/rules', rules);
 app.use('/genders', genders);
@@ -97,6 +96,7 @@ app.use('/change_requests', change_requests);
 app.use('/messages', messages);
 app.use('/notifications', notifications);
 app.use('/field_availabilities', field_availabilities);
+app.use('/closures', closures);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

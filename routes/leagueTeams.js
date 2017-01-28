@@ -14,7 +14,7 @@ router.use(bodyParser.json());
 router.route('/')
 
 //GET all league teams:
-.get(function(req, res) {
+.get(function(req, res, next) {
     LeagueTeam.find(req.query)
         .populate('team')
         .populate('league')
@@ -45,10 +45,10 @@ router.route('/')
 
 //#################################################################################################
 //#################################################################################################
-router.route('/:leagueTeamId')
+router.route('/removeTeamFromLeague/:teamId/:leagueId')
 
 ///DELETE team from league by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     var fullName;
     LeagueTeam.findById(req.params.leagueTeamId)
         .populate('team')
@@ -66,7 +66,7 @@ router.route('/:leagueTeamId')
 router.route('/findLeagueTeams/:leagueId')
 
 //GET all teams that play in this league:
-.get(function(req, res) {
+.get(function(req, res, next) {
     async.waterfall(
         [
             function(callback) {
@@ -85,10 +85,12 @@ router.route('/findLeagueTeams/:leagueId')
                 Team.find({"_id": { "$in": leaguesTeams.map(function(cm) {
                         return cm.team._id })
                     }
-                }, function(err, teams) {
-                    if(err) return next(err);
-                    res.json(teams);
-                    callback(null, teams);
+                })
+                    .sort({ name: 'asc' })
+                    .exec(function(err, teams) {
+                        if(err) return next(err);
+                        res.json(teams);
+                        callback(null, teams);
                 });
             }
         ],
@@ -104,7 +106,7 @@ router.route('/findLeagueTeams/:leagueId')
 router.route('/findTeamsLeagues/:teamId')
 
 //GET all leagues associated with this team:
-.get(function(req, res) {
+.get(function(req, res, next) {
      async.waterfall(
         [
             function(callback) {

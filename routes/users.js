@@ -2,10 +2,8 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var User = require('../models/user');
-var ClubMember = require('../models/clubMember');
 var Certification = require('../models/certification');
 var License = require('../models/license');
-var ClubRole = require('../models/clubRole');
 var Organization = require('../models/organization');
 var Verify = require('./verify');
 
@@ -17,10 +15,9 @@ router.route('/')
 //GET all users
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     User.find(req.query)
-        .sort({ last_name: -1 })
+        .sort({ last_name: 'asc' })
         .populate('ceretifications')
         .populate('licenses')
-        .populate('club_roles')
         .exec(function(err, users) {
             if(err) throw err;
             res.json(users);
@@ -50,7 +47,6 @@ router.route('/:userId')
     User.findById(req.params.userId)
         .populate('ceretifications')
         .populate('licenses')
-        .populate('club_roles')
         .exec(function(err, user) {
             if(err) throw err;
             res.json(user);
@@ -62,7 +58,6 @@ router.route('/:userId')
     User.findByIdAndUpdate(req.params.userId, {$set: req.body}, {new: true})        
         .populate('ceretifications')
         .populate('licenses')
-        .populate('club_roles')
         .exec(function(err, user) {
             if(err) throw err;
             res.json(user);
@@ -77,27 +72,6 @@ router.route('/:userId')
             var full = user.getFullName();
             user.remove();
             res.json("Successfully removed " + full);
-    });
-});
-
-
-//#################################################################################################
-//#################################################################################################
-router.route('/addUserRole/:userId/:clubRoleId')
-
-///PUT add role to user by ID
-.put(Verify.verifyOrdinaryUser, function(req, res, next) {
-    User.findById(req.params.userId)
-        .populate('ceretifications')
-        .populate('licenses')
-        .populate('club_roles')
-        .exec(function(err, user) {
-            if(err) throw err;
-            user.clubRoles.push(req.params.clubRoleId);
-            user.save(function(err, user) {
-                if(err) return next(err);
-                res.json(user);
-            });        
     });
 });
 
@@ -119,11 +93,7 @@ router.route('/findByOrganization/:organizationId')
              populate: {
                path: 'licenses',
                model: 'License'
-             },
-             populate: {
-               path: 'club_roles',
-               model: 'ClubRole'
-             },
+             }
           })
         .exec(function(err, organization) {
             if(err) throw err;
@@ -149,8 +119,7 @@ router.post('/register', function(req, res) {
             country: req.body.country,
             postalCode: req.body.postalCode,
             certifications: req.body.certifications,
-            licenses: req.body.licenses,
-            club_roles: req.body.club_roles
+            licenses: req.body.licenses
         }
     ),
       req.body.password, function(err, user) {

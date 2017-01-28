@@ -14,13 +14,8 @@ var User = new Schema({
     },
     password: {
         type: String,
-        required: true,
         trim: true
     },
-    club_roles: [{
-        type: Schema.Types.ObjectId,
-        ref: 'ClubRole'
-    }],
     first_name: {
         type: String,
         default: '',

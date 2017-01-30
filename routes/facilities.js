@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var Facility = require('../models/facility');
 var Field = require('../models/field');
+var Closure = require('../models/closure');
 var FieldSize = require('../models/fieldSize');
 var async = require('async');
 var Verify = require('./verify');
@@ -302,49 +303,38 @@ router.route('/openFacility/:facilityId')
                     .exec(function(err, facility) {
                         if(err) throw err;
                         var now = new Date().getTime();
-                        //iterate through any closures, find any that are current, and change their end time to current time
+                        var affectedClosureIds = [];
+                        //iterate through any closures, find any that are current, add them to an array
                         console.log("Facility has " + facility.closures.length + " closures");
                         for(var i = 0; i < facility.closures.length; i++) {
                             console.log("for first closure, comparing start time of " + facility.closures[i].start + " and end time of " + facility.closures[i].end + " with current time: " + now);
                             if(facility.closures[i].start < now && facility.closures[i].end > now) {
                                 console.log("Closure is current, changing end time from " + facility.closures[i].end + " to " + now);
-                                facility.closures[i].end = now;
+                                affectedClosureIds.push(facility.closures[i]._id);
                             }
                         }
-                        callback(null, facility);
+                        callback(null, facility, affectedClosureIds);
                 });  
             },
-            function(facility, callback) {
+            function(facility, affectedClosures, callback) {
                 //now grab all fields for the facility and do the same:
-                var count = facility.fields.length;
-                var flds = facility.fields;
-                var newFields = [];
+                var count = affectedClosures.length;
                 
-                console.log("will now update " + count + " fields");    
+                console.log("will now update " + count + " closures");    
                 
-                async.forEach(flds, function(fld, callback) { 
-                    Field.findById(fld._id) 
-                        .exec(function(err, field) {
+                async.forEach(affectedClosures, function(closure, callback) { 
+                    Closure.findById(closure) 
+                        .exec(function(err, clos) {
                             if(err) throw err;
                             var now = new Date().getTime();
-                            //iterate through any closures, find any that are current, and change their end time to current time
-                            console.log("Field has " + field.closures.length + " closures");
-                            for(var i = 0; i < field.closures.length; i++) {
-                                console.log("for first closure, comparing start time of " + field.closures[i].start + " and end time of " + field.closures[i].end + " with current time: " + now);
-                                if(field.closures[i].start < now && field.closures[i].end > now) {
-                                    console.log("Closure is current, changing end time from " + field.closures[i].end + " to " + now);
-                                    field.closures[i].end = now;
-                                }
-                            }      
-                            field.save(function(err, field) {
+                            clos.end = now;
+                            clos.save(function(err, closure) {
                                 if(err) return next(err);
-                                newFields.push(field);
                                 callback();
                             });                             
                     });                
                 }, function(err) {
                     if (err) return next(err);
-                    facility.fields = newFields;
                     callback(null, facility);
                 });                
             }, 

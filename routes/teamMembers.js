@@ -15,8 +15,8 @@ router.use(bodyParser.json());
 router.route('/')
 
 //GET all team members:
-.get(function(req, res) {
-    TeamMember.find({})
+.get(function(req, res, next) {
+    TeamMember.find(req.query)
         .populate('team')
         .populate('member')
         .populate('role')
@@ -49,7 +49,7 @@ router.route('/')
 router.route('/removeAllMembers/:teamId')
 
 ///DELETE all members from team by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     var fullName;
     TeamMember.remove({team: req.params.teamId}, function(err, teamMembers) {
             if(err) throw err;
@@ -64,7 +64,7 @@ router.route('/removeAllMembers/:teamId')
 router.route('/:teamMemberId')
 
 ///GET team member by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     TeamMember.findById(req.params.teamMemberId)
         .populate('team')
         .populate('member')
@@ -76,7 +76,7 @@ router.route('/:teamMemberId')
 })
 
 //PUT update team member by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     TeamMember.findByIdAndUpdate(req.params.teamMemberId, {$set: req.body}, {new: true}) 
         .populate('team')
         .populate('member')
@@ -88,7 +88,7 @@ router.route('/:teamMemberId')
 })
 
 ///DELETE team member by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     TeamMember.findById(req.params.teamMemberId) 
         .populate('team')
         .populate('member')
@@ -106,7 +106,7 @@ router.route('/:teamMemberId')
 router.route('/:userId/:teamId')
 
 ///DELETE team member from team by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     var fullName;
     TeamMember.findOne({member: req.params.userId, team: req.params.teamId})
         .populate('team')
@@ -125,7 +125,7 @@ router.route('/:userId/:teamId')
 router.route('/findMembersTeams/:memberId')
 
 //GET all teams this member is associated with:
-.get(function(req, res) {
+.get(function(req, res, next) {
     async.waterfall(
         [
             function(callback) {
@@ -163,7 +163,7 @@ router.route('/findMembersTeams/:memberId')
 router.route('/findTeamsMembers/:teamId')
 
 //GET all members associated with this team:
-.get(function(req, res) {
+.get(function(req, res, next) {
      async.waterfall(
         [
             function(callback) {
@@ -224,14 +224,14 @@ router.route('/getRosterSize/:teamId')
                     .populate('role')
                     .exec(function(err, members) {
                     if(err) return next(err);
-                    res.json(members.length);
                     callback(null, members);
                 });
             }
         ],
         function(err, members) {
             if(err) return next(err);
-            console.log("Found members : " + members);
+            console.log("Found members : " + members);   
+            res.json(members.length);
         }
     ) 
 });

@@ -11,8 +11,9 @@ router.use(bodyParser.json());
 router.route('/')
 
 //get all genders:
-.get(function(req, res) {
-    Gender.find({})
+.get(function(req, res, next) {
+    Gender.find({})                
+        .sort({ name: 'asc' })
         .exec(function(err, genders) {
             if(err) throw err;
             res.json(genders);
@@ -41,7 +42,7 @@ router.route('/')
 router.route('/:genderId')
 
 ///GET gender by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Gender.findById(req.params.genderId)
         .exec(function(err, gender) {
             if(err) throw err;
@@ -50,7 +51,7 @@ router.route('/:genderId')
 })
 
 //PUT update gender by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     Gender.findByIdAndUpdate(req.params.genderId, {$set: req.body}, {new: true}) 
         .exec(function(err, gender) {
             if(err) throw err;
@@ -59,7 +60,7 @@ router.route('/:genderId')
 })
 
 ///DELETE gender by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     Gender.findById(req.params.genderId)
         .exec(function(err, gender) {
             if(err) throw err;

@@ -11,12 +11,12 @@ router.use(bodyParser.json());
 router.route('/')
 
 //get all leagues:
-.get(function(req, res) {
-    League.find({})
+.get(function(req, res, next) {
+    League.find(req.query)            
+        .sort({ name: 'asc' })
         .populate('min_age_group')
         .populate('max_age_group')
         .populate('type')
-        .populate('reschedule_rule')
         .exec(function(err, leagues) {
             if(err) throw err;
             res.json(leagues);
@@ -45,8 +45,11 @@ router.route('/')
 router.route('/:leagueId')
 
 ///GET league by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     League.findById(req.params.leagueId)
+        .populate('min_age_group')
+        .populate('max_age_group')
+        .populate('type')
         .exec(function(err, league) {
             if(err) throw err;
             res.json(league);
@@ -54,8 +57,11 @@ router.route('/:leagueId')
 })
 
 //PUT update league by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     League.findByIdAndUpdate(req.params.leagueId, {$set: req.body}, {new: true}) 
+        .populate('min_age_group')
+        .populate('max_age_group')
+        .populate('type')
         .exec(function(err, league) {
             if(err) throw err;
             res.json(league);
@@ -63,7 +69,7 @@ router.route('/:leagueId')
 })
 
 ///DELETE league by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     League.findById(req.params.leagueId)
         .exec(function(err, league) {
             if(err) throw err;

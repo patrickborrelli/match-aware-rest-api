@@ -3,6 +3,9 @@ var bodyParser = require('body-parser');
 var AccessRequest = require('../models/accessRequest');
 var Verify = require('./verify');
 var Role = require('../models/role.js');
+var ClubRole = require('../models/clubRole.js');
+var Certification = require('../models/certification.js');
+var License = require('../models/license.js');
 
 var router = express.Router();
 router.use(bodyParser.json());
@@ -12,20 +15,29 @@ router.use(bodyParser.json());
 router.route('/')
 
 //get all access requests:
-.get(function(req, res) {
+.get(function(req, res, next) {
     AccessRequest.find(req.query)
         .populate({ 
-             path: 'user',
-             model: 'User',
-             populate: {
-               path: 'roles',
-               model: 'Role'
-             }
+            path: 'user',
+            model: 'User',
+            populate: {
+                path: 'club_roles',
+                model: 'ClubRole'
+            },
+            populate: {
+                path: 'certifications',
+                model: 'Certification'
+            },
+            populate: {
+                path: 'licenses',
+                model: 'License'
+            }
           })
         .populate('club')
         .populate('role')
         .populate('team')
         .populate('approver')
+        .populate('messages')
         .exec(function(err, accessRequests) {
             if(err) throw err;
             res.json(accessRequests);
@@ -54,20 +66,29 @@ router.route('/')
 router.route('/:accessRequestId')
 
 ///GET access request by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     AccessRequest.findById(req.params.accessRequestId)        
         .populate({ 
-             path: 'user',
-             model: 'User',
-             populate: {
-               path: 'roles',
-               model: 'Role'
-             }
+            path: 'user',
+            model: 'User',
+            populate: {
+                path: 'club_roles',
+                model: 'ClubRole'
+            },
+            populate: {
+                path: 'certifications',
+                model: 'Certification'
+            },
+            populate: {
+                path: 'licenses',
+                model: 'License'
+            }
           })
         .populate('club')
         .populate('role')
         .populate('team')
-        .populate('owner')
+        .populate('approver')
+        .populate('messages')
         .exec(function(err, accessRequest) {
             if(err) throw err;
             res.json(accessRequest);
@@ -75,7 +96,7 @@ router.route('/:accessRequestId')
 })
 
 //PUT update access request by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     AccessRequest.findByIdAndUpdate(req.params.accessRequestId, {$set: req.body}, {new: true}) 
         .exec(function(err, accessRequest) {
             if(err) throw err;
@@ -84,17 +105,10 @@ router.route('/:accessRequestId')
 })
 
 ///DELETE access request by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     var accessRequestName;
     AccessRequest.findById(req.params.accessRequestId)               
-        .populate({ 
-             path: 'user',
-             model: 'User',
-             populate: {
-               path: 'roles',
-               model: 'Role'
-             }
-          })
+        .populate('user')
         .populate('club')
         .populate('role')
         .populate('team')
@@ -120,7 +134,7 @@ router.route('/:accessRequestId')
 router.route('/findByApprover/:userId')
 
 ///GET all access requests pending review by this user
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     AccessRequest.find({$and: 
                             [
                                   { $or: [{status: "PENDING"}, {status: "SENT"}] },
@@ -128,17 +142,26 @@ router.route('/findByApprover/:userId')
                             ]
                        })      
         .populate({ 
-             path: 'user',
-             model: 'User',
-             populate: {
-               path: 'roles',
-               model: 'Role'
-             }
+            path: 'user',
+            model: 'User',
+            populate: {
+                path: 'club_roles',
+                model: 'ClubRole'
+            },
+            populate: {
+                path: 'certifications',
+                model: 'Certification'
+            },
+            populate: {
+                path: 'licenses',
+                model: 'License'
+            }
           })
         .populate('club')
         .populate('role')
         .populate('team')
         .populate('approver')
+        .populate('messages')
         .exec(function(err, accessRequests) {
             if(err) throw err;
             res.json(accessRequests);
@@ -151,20 +174,29 @@ router.route('/findByApprover/:userId')
 router.route('/findByStatus/:status')
 
 ///GET all access requests with the provided status
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     AccessRequest.find({status: req.params.status})        
         .populate({ 
-             path: 'user',
-             model: 'User',
-             populate: {
-               path: 'roles',
-               model: 'Role'
-             }
+            path: 'user',
+            model: 'User',
+            populate: {
+                path: 'club_roles',
+                model: 'ClubRole'
+            },
+            populate: {
+                path: 'certifications',
+                model: 'Certification'
+            },
+            populate: {
+                path: 'licenses',
+                model: 'License'
+            }
           })
         .populate('club')
         .populate('role')
         .populate('team')
         .populate('approver')
+        .populate('messages')
         .exec(function(err, accessRequests) {
             if(err) throw err;
             res.json(accessRequests);

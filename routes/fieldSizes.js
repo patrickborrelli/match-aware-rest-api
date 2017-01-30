@@ -11,8 +11,9 @@ router.use(bodyParser.json());
 router.route('/')
 
 //GET all field sizes
-.get(Verify.verifyOrdinaryUser, function(req, res) {
-    FieldSize.find(req.query)
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
+    FieldSize.find(req.query)            
+        .sort({ name: 'asc' })
         .exec(function(err, sizes) {
             if(err) throw err;
             res.json(sizes);
@@ -20,7 +21,7 @@ router.route('/')
 })
 
 //POST add field sizes
-.post(Verify.verifyOrdinaryUser, function(req, res) {
+.post(Verify.verifyOrdinaryUser, function(req, res, next) {
     FieldSize.create(req.body, function(err, size) {
         if(err) return next(err);
         console.log("New field size created");
@@ -29,7 +30,7 @@ router.route('/')
 })
 
 //DELETE all field sizes
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     FieldSize.find({}, function(err, sizes) {
         if(err) return next(err);
         console.log("Removing all field sizes from system.");
@@ -47,7 +48,7 @@ router.route('/')
 router.route('/:sizeId')
 
 ///GET field size by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     FieldSize.findById(req.params.sizeId)
         .exec(function(err, size) {
             if(err) throw err;
@@ -56,7 +57,7 @@ router.route('/:sizeId')
 })
 
 //PUT update field size by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     FieldSize.findByIdAndUpdate(req.params.sizeId, {$set: req.body}, {new: true}) 
         .exec(function(err, size) {
             if(err) throw err;
@@ -65,7 +66,7 @@ router.route('/:sizeId')
 })
 
 ///DELETE field size by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     FieldSize.findById(req.params.sizeId)
         .exec(function(err, size) {
             if(err) throw err;

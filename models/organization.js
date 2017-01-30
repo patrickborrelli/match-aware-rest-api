@@ -6,11 +6,14 @@ var Club = require('./club.js');
 var Organization = new Schema({
     name: {
         required: true,
-        type: String
+        type: String,
+        trim: true,
+        unique: true
     },
     short_name: {
         required: true,
-        type: String
+        type: String,
+        trim: true
     },
     administrator: {
         type: Schema.Types.ObjectId,

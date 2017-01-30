@@ -11,7 +11,7 @@ router.use(bodyParser.json());
 router.route('/')
 
 //get all notifications:
-.get(function(req, res) {
+.get(function(req, res, next) {
     Notification.find(req.query)
         .populate('event')
         .populate('sender')
@@ -46,7 +46,7 @@ router.route('/')
 router.route('/:notificationId')
 
 ///GET notification by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Notification.findById(req.params.notificationId)
         .populate('event')
         .populate('sender')
@@ -58,7 +58,7 @@ router.route('/:notificationId')
 })
 
 //PUT update notification by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     Notification.findByIdAndUpdate(req.params.notificationId, {$set: req.body}, {new: true}) 
         .exec(function(err, notification) {
             if(err) throw err;
@@ -67,7 +67,7 @@ router.route('/:notificationId')
 })
 
 ///DELETE notification by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     Notification.findById(req.params.notificationId)
         .populate('event')
         .populate('sender')
@@ -84,7 +84,7 @@ router.route('/:notificationId')
 router.route('/findByRecipient/:userId')
 
 ///GET all notifications for a user by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Notification.find({recipient: req.params.userId})
         .populate('event')
         .populate('sender')

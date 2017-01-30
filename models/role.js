@@ -6,7 +6,9 @@ var Role = new Schema({
     
     name: {
         required: true,
-        type: String
+        type: String,
+        trim: true,
+        unique: true
     },
     created_by: {
         type: Schema.Types.ObjectId,

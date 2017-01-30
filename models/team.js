@@ -8,7 +8,8 @@ var Team = new Schema({
     
     name: {
         type: String,
-        require: true
+        require: true,
+        trim: true
     }, 
     gender: {
         type: Schema.Types.ObjectId,

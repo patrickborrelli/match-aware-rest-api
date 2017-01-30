@@ -11,8 +11,9 @@ router.use(bodyParser.json());
 router.route('/')
 
 //GET all league types
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     LeagueType.find(req.query)
+        .sort({ name: 'asc' })
         .exec(function(err, types) {
             if(err) throw err;
             res.json(types);
@@ -20,7 +21,7 @@ router.route('/')
 })
 
 //POST add league types
-.post(Verify.verifyOrdinaryUser, function(req, res) {
+.post(Verify.verifyOrdinaryUser, function(req, res, next) {
     LeagueType.create(req.body, function(err, type) {
         if(err) return next(err);
         console.log("New league type created");
@@ -29,7 +30,7 @@ router.route('/')
 })
 
 //DELETE all league types
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     LeagueType.find({}, function(err, types) {
         if(err) return next(err);
         console.log("Removing all league types from system.");
@@ -47,7 +48,7 @@ router.route('/')
 router.route('/:leagueTypeId')
 
 ///GET league type by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     LeagueType.findById(req.params.leagueTypeId)
         .exec(function(err, type) {
             if(err) throw err;
@@ -56,7 +57,7 @@ router.route('/:leagueTypeId')
 })
 
 //PUT update league type by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     LeagueType.findByIdAndUpdate(req.params.leagueTypeId, {$set: req.body}, {new: true}) 
         .exec(function(err, type) {
             if(err) throw err;
@@ -65,7 +66,7 @@ router.route('/:leagueTypeId')
 })
 
 ///DELETE league type by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     LeagueType.findById(req.params.leagueTypeId)
         .exec(function(err, type) {
             if(err) throw err;

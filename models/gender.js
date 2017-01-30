@@ -4,7 +4,9 @@ var Schema = mongoose.Schema;
 var Gender = new Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
+        unique: true
     },
     short_name: String    
 }, {

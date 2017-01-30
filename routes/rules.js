@@ -11,8 +11,8 @@ router.use(bodyParser.json());
 router.route('/')
 
 //get all rules:
-.get(function(req, res) {
-    Rule.find({})
+.get(function(req, res, next) {
+    Rule.find(req.query)
         .populate('league')
         .populate('age_group')
         .exec(function(err, rules) {
@@ -23,9 +23,6 @@ router.route('/')
 
 //add a new rule to the system:  
 .post(Verify.verifyOrdinaryUser, function(req, res, next) {
-    console.log("Decoded id = " + req.decoded._id);
-    req.body.created_by = req.decoded._id;
-    console.log("Retrieved req.body.created_by: " + req.body.created_by);
     Rule.create(req.body, function(err, rule) {
         if(err) return next(err);
         console.log("New rule created");
@@ -46,7 +43,7 @@ router.route('/')
 router.route('/:ruleId')
 
 ///GET rule by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Rule.findById(req.params.ruleId)        
         .populate('league')
         .populate('age_group')
@@ -57,7 +54,7 @@ router.route('/:ruleId')
 })
 
 //PUT update rule by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     Rule.findByIdAndUpdate(req.params.ruleId, {$set: req.body}, {new: true}) 
         .exec(function(err, rule) {
             if(err) throw err;
@@ -66,7 +63,7 @@ router.route('/:ruleId')
 })
 
 ///DELETE rule by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     var ruleName;
     Rule.findById(req.params.ruleId)               
         .populate('league')

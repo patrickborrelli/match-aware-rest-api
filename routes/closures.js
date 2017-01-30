@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var Club = require('../models/club');
+var Closure = require('../models/closure');
 var Verify = require('./verify');
 
 var router = express.Router();
@@ -10,68 +10,68 @@ router.use(bodyParser.json());
 //#################################################################################################
 router.route('/')
 
-//GET all clubs
+//GET all closures
 .get(Verify.verifyOrdinaryUser, function(req, res, next) {
-    Club.find(req.query)
-        .sort({ name: 'asc' })
-        .exec(function(err, clubs) {
+    Closure.find(req.query)
+        .sort({ start: 'asc' })
+        .exec(function(err, closures) {
             if(err) throw err;
-            res.json(clubs);
+            res.json(closures);
     });
 })
 
-//POST add club
+//POST add closure
 .post(Verify.verifyOrdinaryUser, function(req, res, next) {
-    Club.create(req.body, function(err, club) {
+    Closure.create(req.body, function(err, closure) {
         if(err) return next(err);
-        console.log("New club created");
-        res.json(club);
+        console.log("New closure created");
+        res.json(closure);
     });
 })
 
-//DELETE all clubs
+//DELETE all closures
 .delete(Verify.verifyOrdinaryUser, function(req, res, next) {
-    Club.find({}, function(err, clubs) {
+    Closure.find({}, function(err, closures) {
         if(err) return next(err);
-        console.log("Removing all clubs from system.");
-        console.log(clubs.length + " clubs were found and are pending delete.");
-        for(var i = clubs.length -1; i >= 0; i--) {
-            clubs[i].remove();
+        console.log("Removing all closures from system.");
+        console.log(closures.length + " closures were found and are pending delete.");
+        for(var i = closures.length -1; i >= 0; i--) {
+            closures[i].remove();
         }
-        res.json("Successfully removed all clubs.");        
+        res.json("Successfully removed all closures.");        
     });
 });
 
 
 //#################################################################################################
 //#################################################################################################
-router.route('/:clubId')
+router.route('/:closureId')
 
-///GET club by ID
+///GET closure by ID
 .get(Verify.verifyOrdinaryUser, function(req, res, next) {
-    Club.findById(req.params.clubId)
-        .exec(function(err, club) {
+    Closure.findById(req.params.closureId)
+        .exec(function(err, closure) {
             if(err) throw err;
-            res.json(club);
+            res.json(closure);
     });
 })
 
-//PUT update club by ID
+//PUT update closure by ID
 .put(Verify.verifyOrdinaryUser, function(req, res, next) {
-    Club.findByIdAndUpdate(req.params.clubId, {$set: req.body}, {new: true}) 
-        .exec(function(err, club) {
+    Closure.findByIdAndUpdate(req.params.closureId, {$set: req.body}, {new: true}) 
+        .exec(function(err, closure) {
             if(err) throw err;
-            res.json(club);
+            res.json(closure);
     });
 })
 
-///DELETE club by ID
+///DELETE closure by ID
 .delete(Verify.verifyOrdinaryUser, function(req, res, next) {
-    Club.findById(req.params.clubId)
-        .exec(function(err, club) {
+    Closure.findById(req.params.closureId)
+        .exec(function(err, closure) {
             if(err) throw err;
-            club.remove();
-            res.json("Successfully removed " + club.name);
+            closure.remove();
+            res.json("Successfully removed " + closure);
     });
 });
 

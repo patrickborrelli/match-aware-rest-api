@@ -2,45 +2,11 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var User = require('../models/user');
-var ClubMember = require('../models/clubMember');
 var Certification = require('../models/certification');
 var License = require('../models/license');
-var Role = require('../models/role');
 var Organization = require('../models/organization');
 var Verify = require('./verify');
 
-/**
-    TO BE REINSTATED AT A LATER DATE
-    
-router.get('/facebook', passport.authenticate('facebook'),
-  function(req, res){});
-
-router.get('/facebook/callback', function(req,res,next){
-  passport.authenticate('facebook', function(err, user, info) {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.status(401).json({
-        err: info
-      });
-    } 
-    req.logIn(user, function(err) {
-      if (err) {
-        return res.status(500).json({
-          err: 'Could not log in user'
-        });
-      }
-      var token = Verify.getToken({"username":user.username, "_id":user._id, "admin":user.admin});
-      res.status(200).json({
-        status: 'Login successful!',
-        success: true,
-        token: token
-      });
-    });
-  })(req,res,next);
-});
-*/
 
 //#################################################################################################
 //#################################################################################################
@@ -49,9 +15,9 @@ router.route('/')
 //GET all users
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     User.find(req.query)
+        .sort({ last_name: 'asc' })
         .populate('ceretifications')
         .populate('licenses')
-        .populate('roles')
         .exec(function(err, users) {
             if(err) throw err;
             res.json(users);
@@ -81,7 +47,6 @@ router.route('/:userId')
     User.findById(req.params.userId)
         .populate('ceretifications')
         .populate('licenses')
-        .populate('roles')
         .exec(function(err, user) {
             if(err) throw err;
             res.json(user);
@@ -93,7 +58,6 @@ router.route('/:userId')
     User.findByIdAndUpdate(req.params.userId, {$set: req.body}, {new: true})        
         .populate('ceretifications')
         .populate('licenses')
-        .populate('roles')
         .exec(function(err, user) {
             if(err) throw err;
             res.json(user);
@@ -108,27 +72,6 @@ router.route('/:userId')
             var full = user.getFullName();
             user.remove();
             res.json("Successfully removed " + full);
-    });
-});
-
-
-//#################################################################################################
-//#################################################################################################
-router.route('/addUserRole/:userId/:roleId')
-
-///GET user by ID
-.put(Verify.verifyOrdinaryUser, function(req, res, next) {
-    User.findById(req.params.userId)
-        .populate('ceretifications')
-        .populate('licenses')
-        .populate('roles')
-        .exec(function(err, user) {
-            if(err) throw err;
-            user.roles.push(req.params.roleId);
-            user.save(function(err, user) {
-                if(err) return next(err);
-                res.json(user);
-            });        
     });
 });
 
@@ -150,11 +93,7 @@ router.route('/findByOrganization/:organizationId')
              populate: {
                path: 'licenses',
                model: 'License'
-             },
-             populate: {
-               path: 'roles',
-               model: 'Role'
-             },
+             }
           })
         .exec(function(err, organization) {
             if(err) throw err;
@@ -173,15 +112,14 @@ router.post('/register', function(req, res) {
             last_name: req.body.last_name,
             email_address: req.body.email_address,
             mobile: req.body.mobile,
-            profile_image: req.body.profile_image,
+            profile_image_url: req.body.profile_image_url,
             address: req.body.address,
             city: req.body.city,
             state: req.body.state,
             country: req.body.country,
             postalCode: req.body.postalCode,
             certifications: req.body.certifications,
-            licenses: req.body.licenses,
-            roles: req.body.roles
+            licenses: req.body.licenses
         }
     ),
       req.body.password, function(err, user) {

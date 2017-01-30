@@ -11,7 +11,7 @@ router.use(bodyParser.json());
 router.route('/')
 
 //get all messages:
-.get(function(req, res) {
+.get(function(req, res, next) {
     Message.find(req.query)
         .populate('event')
         .populate('sender')
@@ -46,7 +46,7 @@ router.route('/')
 router.route('/:messageId')
 
 ///GET message by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Message.findById(req.params.messageId)
         .populate('event')
         .populate('sender')
@@ -58,7 +58,7 @@ router.route('/:messageId')
 })
 
 //PUT update message by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     Message.findByIdAndUpdate(req.params.messageId, {$set: req.body}, {new: true}) 
         .exec(function(err, message) {
             if(err) throw err;
@@ -67,7 +67,7 @@ router.route('/:messageId')
 })
 
 ///DELETE message by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     Message.findById(req.params.messageId)
         .populate('event')
         .populate('sender')
@@ -85,7 +85,7 @@ router.route('/:messageId')
 router.route('/findByEvent/:eventId')
 
 ///GET all messages for an event by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Message.find({event: req.params.eventId})
         .populate('event')
         .populate('sender')
@@ -102,7 +102,7 @@ router.route('/findByEvent/:eventId')
 router.route('/findByRecipient/:userId')
 
 ///GET all messages for a user by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Message.find({recipient: req.params.userId})
         .populate('event')
         .populate('sender')
@@ -112,9 +112,5 @@ router.route('/findByRecipient/:userId')
             res.json(message);
     });
 });
-
-
-
-
 
 module.exports = router;

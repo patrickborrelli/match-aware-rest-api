@@ -11,10 +11,12 @@ router.use(bodyParser.json());
 router.route('/')
 
 //get all fields:
-.get(function(req, res) {
-    Field.find(req.query)
+.get(function(req, res, next) {
+    Field.find(req.query)        
+        .sort({ name: 'asc' })
         .populate('facility')
         .populate('size')
+        .populate('closures')
         .exec(function(err, fields) {
             if(err) throw err;
             res.json(fields);
@@ -43,10 +45,11 @@ router.route('/')
 router.route('/:fieldId')
 
 ///GET field by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Field.findById(req.params.fieldId)
         .populate('facility')
         .populate('size')
+        .populate('closures')
         .exec(function(err, field) {
             if(err) throw err;
             res.json(field);
@@ -54,7 +57,7 @@ router.route('/:fieldId')
 })
 
 //PUT update field by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     Field.findByIdAndUpdate(req.params.fieldId, {$set: req.body}, {new: true}) 
         .exec(function(err, field) {
             if(err) throw err;
@@ -63,7 +66,7 @@ router.route('/:fieldId')
 })
 
 ///DELETE field by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     Field.findById(req.params.fieldId)    
         .populate('facility')
         .populate('size')

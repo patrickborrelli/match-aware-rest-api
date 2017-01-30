@@ -13,6 +13,7 @@ router.route('/')
 //GET all organizations
 .get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Organization.find(req.query)
+        .sort({ name: 'asc' })
         .populate('administrator')
         .populate('club_affiliation')
         .populate('staff')
@@ -87,12 +88,41 @@ router.route('/findByClub/:clubId')
 ///GET all organizations working for a club by ID
 .get(Verify.verifyOrdinaryUser, function(req, res, next) {
     Organization.find({club_affiliation: req.params.clubId})
+        .sort({ name: 'asc' })
         .populate('administrator')
         .populate('club_affiliation')
         .populate('staff')
         .exec(function(err, organization) {
             if(err) return next(err);
             res.json(organization);
+    });
+});
+
+//#################################################################################################
+//#################################################################################################
+router.route('/addStaff/:userId/:organizationId')
+
+///PUT add user to organization staff
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
+    Organization.findById(req.params.organizationId)
+        .exec(function(err, org) {
+            if(err) return next(err);
+            var newStaff = true;
+            for(var i = 0; i < org.staff.length; i++) {
+                if(org.staff[i] == req.params.userId) {
+                    console.log("User is already a staff member.");
+                    newStaff = false;
+                }
+            }
+            if(newStaff) {
+                org.staff.push(req.params.userId);
+                org.save(function(err, org) {
+                    if(err) return next(err);
+                    res.json(org);
+                });
+            } else {
+                res.json(org);
+            }            
     });
 });
 

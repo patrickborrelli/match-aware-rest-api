@@ -14,10 +14,11 @@ router.use(bodyParser.json());
 router.route('/')
 
 //GET all league teams:
-.get(function(req, res) {
-    LeagueTeam.find({})
+.get(function(req, res, next) {
+    LeagueTeam.find(req.query)
         .populate('team')
         .populate('league')
+        .populate('added_by')
         .exec(function(err, leagueTeams) {
             if(err) throw err;
             res.json(leagueTeams);
@@ -44,10 +45,10 @@ router.route('/')
 
 //#################################################################################################
 //#################################################################################################
-router.route('/:leagueTeamId')
+router.route('/removeTeamFromLeague/:teamId/:leagueId')
 
 ///DELETE team from league by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     var fullName;
     LeagueTeam.findById(req.params.leagueTeamId)
         .populate('team')
@@ -65,13 +66,14 @@ router.route('/:leagueTeamId')
 router.route('/findLeagueTeams/:leagueId')
 
 //GET all teams that play in this league:
-.get(function(req, res) {
+.get(function(req, res, next) {
     async.waterfall(
         [
             function(callback) {
                 LeagueTeam.find({league: req.params.leagueId})
                     .populate('team')
                     .populate('league')
+                    .populate('added_by')
                     .exec(function(err, leaguesTeams) {
                         if(err) return next(err);
                         console.log("Found " + leaguesTeams.length + " teams in this league.");
@@ -83,10 +85,12 @@ router.route('/findLeagueTeams/:leagueId')
                 Team.find({"_id": { "$in": leaguesTeams.map(function(cm) {
                         return cm.team._id })
                     }
-                }, function(err, teams) {
-                    if(err) return next(err);
-                    res.json(teams);
-                    callback(null, teams);
+                })
+                    .sort({ name: 'asc' })
+                    .exec(function(err, teams) {
+                        if(err) return next(err);
+                        res.json(teams);
+                        callback(null, teams);
                 });
             }
         ],
@@ -102,13 +106,14 @@ router.route('/findLeagueTeams/:leagueId')
 router.route('/findTeamsLeagues/:teamId')
 
 //GET all leagues associated with this team:
-.get(function(req, res) {
+.get(function(req, res, next) {
      async.waterfall(
         [
             function(callback) {
                 LeagueTeam.find({team: req.params.teamId})
                     .populate('team')
                     .populate('league')
+                    .populate('added_by')
                     .exec(function(err, leagueTeams) {
                         if(err) return next(err);
                         console.log("Found " + leagueTeams.length + " leagues for team.");

@@ -11,8 +11,9 @@ router.use(bodyParser.json());
 router.route('/')
 
 //GET all event types
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     EventType.find(req.query)
+        .sort({ name: 'asc' })
         .exec(function(err, eventTypes) {
             if(err) throw err;
             res.json(eventTypes);
@@ -20,7 +21,7 @@ router.route('/')
 })
 
 //POST add event types
-.post(Verify.verifyOrdinaryUser, function(req, res) {
+.post(Verify.verifyOrdinaryUser, function(req, res, next) {
     EventType.create(req.body, function(err, eventType) {
         if(err) return next(err);
         console.log("New event type created");
@@ -29,7 +30,7 @@ router.route('/')
 })
 
 //DELETE all event types
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     EventType.find({}, function(err, eventTypes) {
         if(err) return next(err);
         console.log("Removing all event types from system.");
@@ -47,7 +48,7 @@ router.route('/')
 router.route('/:eventTypeId')
 
 ///GET event type by ID
-.get(Verify.verifyOrdinaryUser, function(req, res) {
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
     EventType.findById(req.params.eventTypeId)
         .exec(function(err, type) {
             if(err) throw err;
@@ -56,7 +57,7 @@ router.route('/:eventTypeId')
 })
 
 //PUT update event type by ID
-.put(Verify.verifyOrdinaryUser, function(req, res) {
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
     EventType.findByIdAndUpdate(req.params.eventTypeId, {$set: req.body}, {new: true}) 
         .exec(function(err, type) {
             if(err) throw err;
@@ -65,7 +66,7 @@ router.route('/:eventTypeId')
 })
 
 ///DELETE event type by ID
-.delete(Verify.verifyOrdinaryUser, function(req, res) {
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     EventType.findById(req.params.eventTypeId)
         .exec(function(err, type) {
             if(err) throw err;

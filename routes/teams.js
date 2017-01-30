@@ -12,7 +12,8 @@ router.route('/')
 
 //get all teams:
 .get(function(req, res) {
-    Team.find({})
+    Team.find(req.query)
+        .sort({ name: 'asc' })
         .populate('gender')
         .populate('age_group')
         .populate('club')

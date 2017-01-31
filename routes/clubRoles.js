@@ -59,9 +59,7 @@ router.route('/')
             if(err) return next(err);
             res.json(newRole);
         }   
-    )
-    
-    
+    )    
 })
 
 //DELETE all club roles
@@ -76,6 +74,57 @@ router.route('/')
         res.json("Successfully removed all club roles.");        
     });
 });
+
+//#################################################################################################
+//#################################################################################################
+router.route('/addMultipleRoles/:userId/:clubId')
+
+//POST add club role
+.post(Verify.verifyOrdinaryUser, function(req, res, next) {
+    var addedRoles = [];
+    async.forEach(req.body.roleIds, function(roleId, callback) { 
+        async.waterfall(
+            [
+                function(callback) {
+                    //first check if role already exists:
+                    ClubRole.findOne({member: req.params.userId, club: req.params.clubId, role: roleId})
+                        .populate('club')
+                        .populate('role')
+                        .populate('member')
+                        .exec(function(err, role) {
+                            if(err) throw err;
+                            callback(null, role);
+                    });
+                },
+                function(role, callback) {
+                    //only if the role doesn't already exist:
+                    if(role == null) {
+                        console.log("Decoded id = " + req.decoded._id);
+                        ClubRole.create({member: req.params.userId, club: req.params.clubId, role: roleId, created_by: req.decoded._id }, function(err, newRole) {
+                            if(err) return next(err);
+                            console.log("New role created");
+                            callback(null, newRole);
+                        });
+                    } else {
+                        console.log("role already exists, not creating");
+                        callback(null, role);
+                    }
+                }
+             ],
+            function(err, newRole) {
+                if(err) return next(err);
+                addedRoles.push(newRole);
+                callback();
+            }   
+        )
+    }, function(err) {
+        if (err) return next(err);
+        res.json(addedRoles);
+    });
+            
+                                                                        
+           
+})
 
 //#################################################################################################
 //#################################################################################################

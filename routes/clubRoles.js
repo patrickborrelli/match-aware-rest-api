@@ -25,14 +25,43 @@ router.route('/')
 
 //POST add club role
 .post(Verify.verifyOrdinaryUser, function(req, res, next) {
-    console.log("Decoded id = " + req.decoded._id);
-    req.body.added_by = req.decoded._id;
-    console.log("Retrieved req.body.created_by: " + req.body.added_by);
-    ClubRole.create(req.body, function(err, role) {
-        if(err) return next(err);
-        console.log("New role created");
-        res.json(role);
-    });
+    async.waterfall(
+        [
+            function(callback) {
+                //first check if role already exists:
+                ClubRole.findOne({member: req.body.member, club: req.body.club, role: req.body.role})
+                    .populate('club')
+                    .populate('role')
+                    .populate('member')
+                    .exec(function(err, role) {
+                        if(err) throw err;
+                        callback(null, role);
+                });
+            },
+            function(role, callback) {
+                //only if the role doesn't already exist:
+                if(role == null) {
+                    console.log("Decoded id = " + req.decoded._id);
+                    req.body.added_by = req.decoded._id;
+                    console.log("Retrieved req.body.created_by: " + req.body.added_by);
+                    ClubRole.create(req.body, function(err, newRole) {
+                        if(err) return next(err);
+                        console.log("New role created");
+                        callback(null, newRole);
+                    });
+                } else {
+                    console.log("role already exists, not creating");
+                    callback(null, role);
+                }
+            }            
+        ],
+        function(err, newRole) {
+            if(err) return next(err);
+            res.json(newRole);
+        }   
+    )
+    
+    
 })
 
 //DELETE all club roles

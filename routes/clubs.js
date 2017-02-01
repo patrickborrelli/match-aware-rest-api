@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var Club = require('../models/club');
 var ClubRole = require('../models/clubRole');
+var deepPopulate = require('mongoose-deep-populate');
 var Verify = require('./verify');
 
 var router = express.Router();
@@ -84,8 +85,8 @@ router.route('/getClubMembers/:clubId')
 ///GET all club members by club ID
 .get(Verify.verifyOrdinaryUser, function(req, res, next) {
     
-    ClubRole.find({club: req.params.clubId})
-        .populate('member')
+    ClubRole.find({club: req.params.clubId})    
+        .deepPopulate('member.certifications member.licenses member.roles.role members.role.club')
         .exec(function(err, userRoles) {
             if(err) return next(err);
             var users = [];

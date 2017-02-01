@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 var Club = require('./club.js');
 var Role = require('./role.js');
 var User = require('./user.js');
+var deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 var ClubRole = new Schema({
     club: {
@@ -28,4 +29,5 @@ var ClubRole = new Schema({
     timestamps: true
 });
 
+ClubRole.plugin(deepPopulate);
 module.exports = mongoose.model('ClubRole', ClubRole);

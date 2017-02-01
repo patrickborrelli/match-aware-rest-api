@@ -140,7 +140,7 @@ router.route('/addMultipleRoles/:userId/:clubId')
                         console.log("Decoded id = " + req.decoded._id);
                         req.body.added_by = req.decoded._id;
                         console.log("Retrieved req.body.created_by: " + req.body.added_by);
-                        ClubRole.create(req.body, function(err, newRole) {
+                        ClubRole.create({member: req.params.userId, club: req.params.clubId, role: roleId, created_by: req.decoded._id }, function(err, newRole) {
                             if(err) return next(err);
                             console.log("New role created");
                             callback(null, newRole, true);

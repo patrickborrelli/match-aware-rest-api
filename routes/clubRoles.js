@@ -153,7 +153,7 @@ router.route('/addMultipleRoles/:userId/:clubId')
                 function(role, isNew, callback) {
                     //if the role was newly added, aslo add it to the collection held by the user:
                     if(isNew) {
-                        User.findById(req.body.member)
+                        User.findById(req.params.userId)
                             .populate('roles')
                             .exec(function(err, user) {
                                 if(err) return next(err);

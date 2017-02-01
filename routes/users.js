@@ -5,6 +5,10 @@ var User = require('../models/user');
 var Certification = require('../models/certification');
 var License = require('../models/license');
 var Organization = require('../models/organization');
+var ClubRole = require('../models/clubRole');
+var Role = require('../models/role');
+var Club = require('../models/club');
+var deepPopulate = require('mongoose-deep-populate');
 var Verify = require('./verify');
 
 
@@ -16,8 +20,9 @@ router.route('/')
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     User.find(req.query)
         .sort({ last_name: 'asc' })
-        .populate('ceretifications')
+        .populate('certifications')
         .populate('licenses')
+        .deepPopulate('roles.role roles.club')     
         .exec(function(err, users) {
             if(err) throw err;
             res.json(users);
@@ -45,8 +50,9 @@ router.route('/:userId')
 ///GET user by ID
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     User.findById(req.params.userId)
-        .populate('ceretifications')
+        .populate('certifications')
         .populate('licenses')
+        .deepPopulate('roles.role roles.club') 
         .exec(function(err, user) {
             if(err) throw err;
             res.json(user);
@@ -55,9 +61,10 @@ router.route('/:userId')
 
 //PUT update user by ID
 .put(Verify.verifyOrdinaryUser, function(req, res) {
-    User.findByIdAndUpdate(req.params.userId, {$set: req.body}, {new: true})        
-        .populate('ceretifications')
+    User.findByIdAndUpdate(req.params.userId, {$set: req.body}, {new: true})
+        .populate('certifications')
         .populate('licenses')
+        .deepPopulate('roles.role roles.club') 
         .exec(function(err, user) {
             if(err) throw err;
             res.json(user);

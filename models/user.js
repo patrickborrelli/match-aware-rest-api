@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 var Certification = require('./certification.js');
 var License = require('./license.js');
 var ClubRole = require('./clubRole.js');
+var deepPopulate = require('mongoose-deep-populate')(mongoose);
 var passportLocalMongoose = require('passport-local-mongoose');
 
 var User = new Schema({
@@ -69,11 +70,17 @@ var User = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'License'
     }],
+    roles: [{
+        type: Schema.Types.ObjectId,
+        ref: 'ClubRole'
+    }],
     OauthId: String,
     OauthToken: String,
 }, {
     timestamps: true
 });
+
+User.plugin(deepPopulate);
 
 User.methods.getFullName = function() {
     return(this.first_name + ' ' + this.last_name);

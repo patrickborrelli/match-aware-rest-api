@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var ClubRole = require('../models/clubRole');
+var User = require('../models/user');
 var async = require('async');
 var Verify = require('./verify');
 
@@ -35,6 +36,8 @@ router.route('/')
                     .populate('member')
                     .exec(function(err, role) {
                         if(err) throw err;
+                        console.log("Retrieved role");
+                        console.log(role);
                         callback(null, role);
                 });
             },
@@ -47,13 +50,34 @@ router.route('/')
                     ClubRole.create(req.body, function(err, newRole) {
                         if(err) return next(err);
                         console.log("New role created");
-                        callback(null, newRole);
+                        callback(null, newRole, true);
                     });
                 } else {
                     console.log("role already exists, not creating");
-                    callback(null, role);
+                    callback(null, role, false);
                 }
-            }            
+            },
+            function(role, isNew, callback) {
+                //if the role was newly added, aslo add it to the collection held by the user:
+                if(isNew) {
+                    User.findById(req.body.member)
+                        .populate('roles')
+                        .exec(function(err, user) {
+                            if(err) return next(err);
+                            //get the users roles array and push any new role onto it then save the user:
+                            user.roles.push(role);
+                            user.save(function(err, modUser) {
+                                if(err) return next(err);
+                                console.log("Successfully added new role to user");
+                                console.log(modUser);
+                            });   
+                            callback(null, role);
+                    });
+                } else {
+                    console.log("role already exists, not adding to user");
+                    callback(null, role);
+                }                
+            }
         ],
         function(err, newRole) {
             if(err) return next(err);
@@ -77,6 +101,20 @@ router.route('/')
 
 //#################################################################################################
 //#################################################################################################
+router.route('/:clubRoleId')
+
+///DELETE club role by ID
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
+    ClubRole.findById(req.params.clubRoleId)
+        .exec(function(err, role) {
+            if(err) throw err;
+            role.remove();
+            res.json("Successfully removed club role");
+    });
+});
+
+//#################################################################################################
+//#################################################################################################
 router.route('/addMultipleRoles/:userId/:clubId')
 
 //POST add club role
@@ -87,7 +125,7 @@ router.route('/addMultipleRoles/:userId/:clubId')
             [
                 function(callback) {
                     //first check if role already exists:
-                    ClubRole.findOne({member: req.params.userId, club: req.params.clubId, role: roleId})
+                    ClubRole.findOne({member: req.body.member, club: req.body.club, role: req.body.role})
                         .populate('club')
                         .populate('role')
                         .populate('member')
@@ -100,15 +138,38 @@ router.route('/addMultipleRoles/:userId/:clubId')
                     //only if the role doesn't already exist:
                     if(role == null) {
                         console.log("Decoded id = " + req.decoded._id);
-                        ClubRole.create({member: req.params.userId, club: req.params.clubId, role: roleId, created_by: req.decoded._id }, function(err, newRole) {
+                        req.body.added_by = req.decoded._id;
+                        console.log("Retrieved req.body.created_by: " + req.body.added_by);
+                        ClubRole.create(req.body, function(err, newRole) {
                             if(err) return next(err);
                             console.log("New role created");
-                            callback(null, newRole);
+                            callback(null, newRole, true);
                         });
                     } else {
                         console.log("role already exists, not creating");
-                        callback(null, role);
+                        callback(null, role, false);
                     }
+                },
+                function(role, isNew, callback) {
+                    //if the role was newly added, aslo add it to the collection held by the user:
+                    if(isNew) {
+                        User.findById(req.body.member)
+                            .populate('roles')
+                            .exec(function(err, user) {
+                                if(err) return next(err);
+                                //get the users roles array and push any new role onto it then save the user:
+                                user.roles.push(role);
+                                user.save(function(err, modUser) {
+                                    if(err) return next(err);
+                                    console.log("Successfully added new role to user");
+                                    console.log(modUser);
+                                });   
+                                callback(null, role);
+                        });
+                    } else {
+                        console.log("role already exists, not adding to user");
+                        callback(null, role);
+                    }                
                 }
              ],
             function(err, newRole) {

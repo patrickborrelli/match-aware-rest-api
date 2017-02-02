@@ -125,7 +125,7 @@ router.route('/addMultipleRoles/:userId/:clubId')
             [
                 function(callback) {
                     //first check if role already exists:
-                    ClubRole.findOne({member: req.body.member, club: req.body.club, role: req.body.role})
+                    ClubRole.findOne({member: req.params.userId, club: req.params.clubId, role: req.body.role})
                         .populate('club')
                         .populate('role')
                         .populate('member')
@@ -138,8 +138,6 @@ router.route('/addMultipleRoles/:userId/:clubId')
                     //only if the role doesn't already exist:
                     if(role == null) {
                         console.log("Decoded id = " + req.decoded._id);
-                        req.body.added_by = req.decoded._id;
-                        console.log("Retrieved req.body.created_by: " + req.body.added_by);
                         ClubRole.create({member: req.params.userId, club: req.params.clubId, role: roleId, created_by: req.decoded._id }, function(err, newRole) {
                             if(err) return next(err);
                             console.log("New role created");

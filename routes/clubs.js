@@ -89,12 +89,16 @@ router.route('/getClubMembers/:clubId')
         .deepPopulate('member.certifications member.licenses member.roles.role members.role.club')
         .exec(function(err, userRoles) {
             if(err) return next(err);
-            var users = [];
+            var users = new Set();
             
             for(var i = 0; i < userRoles.length; i++) {
-                users.push(userRoles[i].member);
+                //only want users in the list once so...                
+                users.add(userRoles[i].member);
+                console.log("found club member " + i);
+                console.log(users);
             }
-            res.json(users);
+            var theUsers = Array.from(users);
+            res.json(theUsers);
     });   
 });
 

@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var ClubRole = require('../models/clubRole');
 var User = require('../models/user');
 var async = require('async');
+var deepPopulate = require('mongoose-deep-populate');
 var Verify = require('./verify');
 
 var router = express.Router();
@@ -88,7 +89,7 @@ router.route('/')
 
 //DELETE all club roles
 .delete(Verify.verifyOrdinaryUser, function(req, res, next) {
-    ClubRole.find({}, function(err, roles) {
+    ClubRole.find(req.query, function(err, roles) {
         if(err) return next(err);
         console.log("Removing all club roles from system.");
         console.log(roles.length + " club roles were found and are pending delete.");
@@ -113,6 +114,64 @@ router.route('/:clubRoleId')
     });
 });
 
+
+//#################################################################################################
+//#################################################################################################
+router.route('/replaceAllRoles/:userId/:clubId')
+
+//POST replace all existing roles for this user in this club
+.post(Verify.verifyOrdinaryUser, function(req, res, next) {
+    
+    //1 - remove all clubRoles with this user/club
+    //2 - for each role id in the body, create a clubRole and add its ID to an array
+    //3 - edit the user and add the new array to his user.roles
+    
+    var addedRoles = [];
+    
+    async.waterfall(
+        [
+            function(callback) {
+                ClubRole.find({club: req.params.clubId, member: req.params.userId})
+                    .exec(function(err, roles) {
+                        if(err) return next(err);
+                        for(var i = 0 ; i < roles.length; i++) {
+                            roles[i].remove();
+                        }
+                });
+                callback(null);
+            }, 
+            function(callback) {
+                //create role for each included:
+                async.forEach(req.body.roleIds, function(roleId, callback) {
+                    console.log("Decoded id = " + req.decoded._id);
+                    ClubRole.create({member: req.params.userId, club: req.params.clubId, role: roleId, created_by: req.decoded._id }, function(err, newRole) {
+                        if(err) return next(err);
+                        console.log("New role created " + newRole);
+                        addedRoles.push(newRole._id);
+                        callback();
+                    });
+                }, function(err) {
+                    if (err) return next(err);
+                    console.log("Now adding roles: " + addedRoles + " to user");
+                    User.findByIdAndUpdate(req.params.userId, {$set: {roles: addedRoles}}, {new: true})
+                        .populate('certifications')
+                        .populate('licenses')
+                        .deepPopulate('roles.role roles.club') 
+                        .exec(function(err, user) {
+                            if(err) throw err;
+                            callback(null, user);
+                    });
+                    
+                });                    
+            }
+        ],
+        function(err, user) {
+            if(err) return next(err);
+            res.json(user);
+        }
+    )    
+});
+
 //#################################################################################################
 //#################################################################################################
 router.route('/addMultipleRoles/:userId/:clubId')
@@ -130,7 +189,7 @@ router.route('/addMultipleRoles/:userId/:clubId')
                         .populate('role')
                         .populate('member')
                         .exec(function(err, role) {
-                            if(err) throw err;
+                            if(err) throw err; 
                             callback(null, role);
                     });
                 },

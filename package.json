@@ -18,10 +18,13 @@
     "mongoose-currency": "^0.2.0",
     "mongoose-deep-populate": "^3.0.0",
     "morgan": "~1.7.0",
+    "nodemailer": "^3.1.5",
+    "nodemailer-mailgun-transport": "git+https://github.com/orliesaurus/nodemailer-mailgun-transport.git",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^4.0.0",
+    "sendmail": "^1.1.1",
     "serve-favicon": "~2.3.0"
   },
   "devDependencies": {

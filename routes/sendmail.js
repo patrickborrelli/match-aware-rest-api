@@ -5,15 +5,8 @@ var config = require('../config');
 var nodemailer = require('nodemailer');
 var mg = require('nodemailer-mailgun-transport');
 
-var router = express.Router();
-router.use(bodyParser.json());
 
-//#################################################################################################
-//#################################################################################################
-router.route('/')
-
-//add a new field to the system:  
-.post(Verify.verifyOrdinaryUser, function(req, res, next) {
+exports.sendInviteEmail = function(req, res, next) {
     var auth = {
         auth: {
             api_key: config.mailApiKey,
@@ -25,15 +18,14 @@ router.route('/')
     
     transport.sendMail({
         from: 'postmaster@matchaware.com',
-        to: 'patrickborrelli@gmail.com',
-        subject: 'Second Email from MatchAware',
-        html: '<p><h1>Welcome to MatchAware</h1><br><p>Please come to the website to begin your journey.</p>'
+        to: req.body.sendToEmail,
+        subject: 'Invite to MatchAware',
+        html: req.body.emailHtml,
+        text: req.body.emailText
     }, function(err, info) {
         if(err) return next(err);
         console.log("Response: " + info);
-        res.json("Response: " + info);
+        req.body.emailResponse = JSON.stringify(info);
+        next();
     });
-    
-});
-
-module.exports = router;
+};

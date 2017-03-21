@@ -98,7 +98,6 @@ app.use('/messages', messages);
 app.use('/notifications', notifications);
 app.use('/field_availabilities', field_availabilities);
 app.use('/closures', closures);
-app.use('/sendmail', sendmail);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

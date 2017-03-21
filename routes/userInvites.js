@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var UserInvite = require('../models/userInvite');
 var Verify = require('./verify');
+var SendMail = require('./sendmail');
 
 var router = express.Router();
 router.use(bodyParser.json());
@@ -21,7 +22,8 @@ router.route('/')
 })
 
 //add a new user invite to the system:  
-.post(Verify.verifyOrdinaryUser, function(req, res, next) {
+.post(Verify.verifyOrdinaryUser, SendMail.sendInviteEmail, function(req, res, next) {
+    console.log(req.emailResponse);
     UserInvite.create(req.body, function(err, userInvite) {
         if(err) return next(err);
         console.log("New user invite created");

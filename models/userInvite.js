@@ -7,7 +7,7 @@ var UserInvite = new Schema({
         type: Number,
         required: true
     },
-    email: String,
+    sendToEmail: String,
     mobile: String,
     role: {
         type: Schema.Types.ObjectId,
@@ -17,7 +17,10 @@ var UserInvite = new Schema({
     status: {
         type: String,
         enum: ['SENT', 'ACCEPTED', 'REJECTED']
-    }
+    },
+    emailHtml: String,
+    emailText: String,
+    emailResponse: String
 }, {
     timestamps: true
 });

@@ -20,7 +20,8 @@ var UserInvite = new Schema({
     },
     emailHtml: String,
     emailText: String,
-    emailResponse: String
+    emailResponse: String,
+    emailSubject: String
 }, {
     timestamps: true
 });

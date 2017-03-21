@@ -19,7 +19,7 @@ exports.sendInviteEmail = function(req, res, next) {
     transport.sendMail({
         from: 'postmaster@matchaware.com',
         to: req.body.sendToEmail,
-        subject: 'Invite to MatchAware',
+        subject: req.body.emailSubject,
         html: req.body.emailHtml,
         text: req.body.emailText
     }, function(err, info) {

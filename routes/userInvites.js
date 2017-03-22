@@ -92,7 +92,7 @@ router.route('/deleteByKey/:inviteKey')
 
 ///DELETE user invite by invite key
 .delete(Verify.verifyOrdinaryUser, function(req, res) {
-    UserInvite.find({invite_key: req.params.inviteKey})
+    UserInvite.findOne({invite_key: req.params.inviteKey})
         .exec(function(err, userInvite) {
             if(err) throw err;        
             userInvite.remove();

@@ -76,13 +76,27 @@ router.route('/:userInviteId')
 //#################################################################################################
 router.route('/findByKey/:inviteKey')
 
-///GET user invite by ID
+///GET user invite by invite key
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     UserInvite.find({invite_key: req.params.inviteKey})
         .populate('role')
         .exec(function(err, userInvite) {
             if(err) throw err;
             res.json(userInvite);
+    });
+});
+
+//#################################################################################################
+//#################################################################################################
+router.route('/deleteByKey/:inviteKey')
+
+///DELETE user invite by invite key
+.delete(Verify.verifyOrdinaryUser, function(req, res) {
+    UserInvite.find({invite_key: req.params.inviteKey})
+        .exec(function(err, userInvite) {
+            if(err) throw err;        
+            userInvite.remove();
+            res.json("Successfully removed user invite " + userInvite.invite_key);
     });
 });
 

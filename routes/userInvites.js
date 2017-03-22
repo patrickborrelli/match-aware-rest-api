@@ -15,6 +15,7 @@ router.route('/')
 .get(function(req, res) {
     UserInvite.find(req.query)
         .populate('role')
+        .populate('club')
         .exec(function(err, userInvites) {
             if(err) throw err;
             res.json(userInvites);
@@ -47,6 +48,7 @@ router.route('/:userInviteId')
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     UserInvite.findById(req.params.userInviteId)
         .populate('role')
+        .populate('club')
         .exec(function(err, userInvite) {
             if(err) throw err;
             res.json(userInvite);
@@ -80,6 +82,7 @@ router.route('/findByKey/:inviteKey')
 .get(Verify.verifyOrdinaryUser, function(req, res) {
     UserInvite.find({invite_key: req.params.inviteKey})
         .populate('role')
+        .populate('club')
         .exec(function(err, userInvite) {
             if(err) throw err;
             res.json(userInvite);

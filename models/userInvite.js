@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Role = require('./role.js');
+var Club = rquire('./club.js');
 
 var UserInvite = new Schema({
     invite_key: {
@@ -21,7 +22,12 @@ var UserInvite = new Schema({
     emailHtml: String,
     emailText: String,
     emailResponse: String,
-    emailSubject: String
+    emailSubject: String, 
+    club: {
+        type: Schema.Types.ObjectId,
+        ref: 'Club',
+        required: true
+    }
 }, {
     timestamps: true
 });

@@ -45,6 +45,22 @@ router.route('/')
 
 //#################################################################################################
 //#################################################################################################
+router.route('/:teamId')
+
+//DELETE all leagues for team
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
+    LeagueTeam.find({team: req.params.teamId}, function(err, leagueTeams) {
+        if(err) return next(err);
+        for(var i = 0; i < leagueTeams.length; i++) {
+            leagueTeams[i].remove();
+        }
+        console.log("Removed: \n" + leagueTeams);
+        res.json("All leagues removed for team.");
+    });
+});
+
+//#################################################################################################
+//#################################################################################################
 router.route('/removeTeamFromLeague/:teamId/:leagueId')
 
 ///DELETE team from league by ID

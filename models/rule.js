@@ -56,13 +56,13 @@ var Rule = new Schema({
     },
     intermission_duration_minutes: {
         type: Number,
-        default: 10
+        default: 5
     },
     ball_size: {
         type: String,
         enum: ['2', '3', '4', '5']
     },
-    offisde: {
+    offside: {
         type: Boolean,
         default: true
     },

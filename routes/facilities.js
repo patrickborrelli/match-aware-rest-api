@@ -4,6 +4,7 @@ var Facility = require('../models/facility');
 var Field = require('../models/field');
 var Closure = require('../models/closure');
 var FieldSize = require('../models/fieldSize');
+var deepPopulate = require('mongoose-deep-populate');
 var async = require('async');
 var Verify = require('./verify');
 
@@ -19,14 +20,7 @@ router.route('/')
     Facility.find(req.query)
         .sort({ name: 'asc' })
         .populate('club_affiliation')
-        .populate({ 
-             path: 'fields',
-             model: 'Field',
-             populate: {
-               path: 'size',
-               model: 'FieldSize'
-             }
-          })
+        .deepPopulate('fields.size fields.closures')
         .populate('closures')
         .exec(function(err, facilities) {
             if(err) throw err;

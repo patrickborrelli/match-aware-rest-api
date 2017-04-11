@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 var Field = require('./field.js');
 var Club = require('./club.js');
 var Closure = require('./closure.js');
+var deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 var Facility = new Schema({
     name: {
@@ -70,4 +71,5 @@ var Facility = new Schema({
     timestamps: true
 });
 
+Facility.plugin(deepPopulate);
 module.exports = mongoose.model('Facility', Facility);

@@ -8,7 +8,10 @@ var Organization = require('../models/organization');
 var ClubRole = require('../models/clubRole');
 var Role = require('../models/role');
 var Club = require('../models/club');
+var TeamMember = require('../models/teamMember');
+var UserSetting = require('../models/userSetting');
 var deepPopulate = require('mongoose-deep-populate');
+var async = require('async');
 var Verify = require('./verify');
 
 
@@ -80,6 +83,96 @@ router.route('/:userId')
             user.remove();
             res.json("Successfully removed " + full);
     });
+});
+
+//#################################################################################################
+//#################################################################################################
+router.route('/deactivate/:userId')
+
+///PUT update user to inactivate account
+.put(Verify.verifyOrdinaryUser, function(req, res) {
+    async.waterfall(
+        [
+            function(callback) {
+                User.findById(req.params.userId)
+                    .populate({ 
+                         path: 'staff',
+                         model: 'User',
+                         populate: {
+                           path: 'certifications',
+                           model: 'Certification'
+                         }, 
+                         populate: {
+                           path: 'licenses',
+                           model: 'License'
+                         }
+                      })
+                    .exec(function(err, user) {
+                        if(err) throw err;
+                        callback(null, user);
+                    });                
+            },
+            function(user, callback) {
+                //remove all club roles for this user:
+                ClubRole.find({member: user._id}, function(err, roles) {
+                    if(err) return next(err);
+                    console.log("Removing all club roles for user " + user.getFullName());
+                    console.log(roles.length + " club roles were found and are pending delete.");
+                    for(var i = roles.length -1; i >= 0; i--) {
+                        roles[i].remove();
+                    }
+                    callback(null, user);        
+                });
+            }, 
+            function(user, callback) {
+                //remove all team memberships:
+                TeamMember.find({member: user._id}, function(err, teamMembers) {
+                    if(err) return next(err);                    
+                    console.log(teamMembers.length + " team memberships were found and are pending delete.");
+                    for(var i = teamMembers.length -1; i >= 0; i--) {
+                        teamMembers[i].remove();
+                    }
+                    console.log("All team memberships removed for user " + user.getFullName());                    
+                    callback(null, user);
+                });
+            }, 
+            function(user, callback) {
+                //remove user settings:
+                UserSetting.findOne({user: user._id}, function(err, setting) {
+                    if(err) throw err;
+                    if(setting != null) {
+                        setting.remove();
+                        console.log("Successfully removed user settings for " + user.getFullName());                    
+                        callback(null, user);
+                    } else {
+                        console.log("No user settings for user " + user.getFullName());                    
+                        callback(null, user);
+                    }                    
+                });
+            }, 
+            function(user, callback) {
+                //handle organizations:
+                //TODO: handle removing a user who is an organizational admkinistrator;
+                callback(null, user);
+            }, 
+            function(user, callback) {
+                //finally, mark user as inactive, save the user and return.
+                user.roles = [];
+                user.active = false;
+                user.save(function(err, savedUser){
+                    if(err) return next(err);
+                    console.log("Successfully updated user " + user.getFullName());
+                    callback(null, savedUser);
+                });
+                
+            }
+        ],
+        function(err, user) {
+            if(err) return next(err);
+            res.json(user);
+        }
+    )   
+    
 });
 
 

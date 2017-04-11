@@ -42,6 +42,10 @@ var User = new Schema({
         type: String,
         default: './images/defaultUser.png'
     },
+    active: {       
+        type: Boolean,
+        default: true
+    },
     address: {
         type: String,
         trim: true

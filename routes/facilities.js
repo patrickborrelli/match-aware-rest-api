@@ -359,44 +359,48 @@ router.route('/reopenFields/:facilityId')
                     .populate('club_affiliation')
                     .deepPopulate('fields.closures')
                     .exec(function(err, facility) {
-                        if(err) throw err;                        
+                        if(err) throw err;   
+                        console.log("Found facility:");
+                        console.log(facility);
                         callback(null, facility);
                 });  
             },
             function(facility, callback) {
                 //now grab all fields for the facility:
                 var fields = facility.fields;
+                console.log("Looking at all fields: ");
+                console.log(fields);
+                
                                 
                 async.forEach(fields, function(field, callback) { 
-                    var fieldClosures = field.closures;
-                    
+                    var fieldClosures = field.closures; 
+                    var now = new Date().getTime();
+                    console.log("Field: " + field.name + " has " + fieldClosures.length + " closures");
                     
                     async.forEach(fieldClosures, function(closure, callback) {
+                        
                         Closure.findById(closure) 
-                            .exec(function(err, clos) {
+                            .exec(function(err, close) {
                                 if(err) throw err;
-                                var now = new Date().getTime();
-                                clos.end = now;
-                                clos.save(function(err, closure) {
-                                    if(err) return next(err);
+                                if(close.start <= now && close.end > now) {
+                                    close.end = now;
+                                    close.save(function(err, newClosure) {
+                                        if(err) return next(err);
+                                        callback();
+                                    });
+                                } else {
                                     callback();
-                                });                             
+                                }                            
                         });
-                    })
-                    
-                    
-                    
+                    }, function(err) {
+                        if (err) return next(err);
+                    });
+                    callback();
                 }, function(err) {
                     if (err) return next(err);
                     callback(null, facility);
                 });                
-            }, 
-            function(facility, callback) {
-                facility.save(function(err, facility) {
-                    if(err) return next(err);
-                    callback(null, facility);
-                })
-            }
+            } 
         ],
         function(err, facility) {
             res.json(facility);

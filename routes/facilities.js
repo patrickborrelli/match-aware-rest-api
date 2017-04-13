@@ -276,7 +276,7 @@ router.route('/deleteAllClosures/:facilityId')
 //#################################################################################################
 router.route('/openFacility/:facilityId')
 
-///PUT open all of this facility's fields
+///PUT open all fields in a closed facility
 .put(Verify.verifyOrdinaryUser, function(req, res, next) {
     //first, get all closures for this facility, find any that have a start time less than current and an end time greater than current.
     //if so, change end time to current.
@@ -344,5 +344,65 @@ router.route('/openFacility/:facilityId')
         }
     )     
 });
+
+//#################################################################################################
+//#################################################################################################
+router.route('/reopenFields/:facilityId')
+
+///PUT open any of this open facility's fields that are currently closed
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
+    //first, retrieve the facility
+    async.waterfall(
+        [
+            function(callback) {
+                Facility.findById(req.params.facilityId)
+                    .populate('club_affiliation')
+                    .deepPopulate('fields.closures')
+                    .exec(function(err, facility) {
+                        if(err) throw err;                        
+                        callback(null, facility);
+                });  
+            },
+            function(facility, callback) {
+                //now grab all fields for the facility:
+                var fields = facility.fields;
+                                
+                async.forEach(fields, function(field, callback) { 
+                    var fieldClosures = field.closures;
+                    
+                    
+                    async.forEach(fieldClosures, function(closure, callback) {
+                        Closure.findById(closure) 
+                            .exec(function(err, clos) {
+                                if(err) throw err;
+                                var now = new Date().getTime();
+                                clos.end = now;
+                                clos.save(function(err, closure) {
+                                    if(err) return next(err);
+                                    callback();
+                                });                             
+                        });
+                    })
+                    
+                    
+                    
+                }, function(err) {
+                    if (err) return next(err);
+                    callback(null, facility);
+                });                
+            }, 
+            function(facility, callback) {
+                facility.save(function(err, facility) {
+                    if(err) return next(err);
+                    callback(null, facility);
+                })
+            }
+        ],
+        function(err, facility) {
+            res.json(facility);
+        }
+    )     
+});
+
 
 module.exports = router;

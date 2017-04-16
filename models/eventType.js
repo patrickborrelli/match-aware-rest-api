@@ -12,7 +12,6 @@ var EventType = new Schema({
     field_type: {
         type: String,
         trim: true,
-        unique: true,
         enum: ['PRACTICE', 'GAME', 'TOURNAMENT', 'TRAINING', 'ALL_PURPOSE']
     }
 }, {

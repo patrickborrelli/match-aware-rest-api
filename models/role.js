@@ -10,6 +10,12 @@ var Role = new Schema({
         trim: true,
         unique: true
     },
+    pretty_name: {
+        required: true,
+        type: String,
+        trim: true,
+        unique: true
+    },
     created_by: {
         type: Schema.Types.ObjectId,
         ref: 'User'

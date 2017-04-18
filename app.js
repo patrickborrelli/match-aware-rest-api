@@ -48,6 +48,7 @@ var notifications = require('./routes/notifications');
 var field_availabilities = require('./routes/fieldAvailabilities');
 var closures = require('./routes/closures');
 var sendmail = require('./routes/sendmail');
+var bid_campaigns = require('./routes/bidCampaigns');
 
 var app = express();
 
@@ -98,6 +99,7 @@ app.use('/messages', messages);
 app.use('/notifications', notifications);
 app.use('/field_availabilities', field_availabilities);
 app.use('/closures', closures);
+app.use('/bid_Campaigns', bid_campaigns);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

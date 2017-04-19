@@ -39,4 +39,4 @@ var BidCampaign = new Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('License', License);
+module.exports = mongoose.model('BidCampaign', BidCampaign);

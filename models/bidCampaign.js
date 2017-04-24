@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var AgeGroup = require('./ageGroup.js');
 var Event = require('./event.js');
+var User = require('./user.js');
 var Schema = mongoose.Schema;
 
 var BidCampaign = new Schema({
@@ -31,6 +32,10 @@ var BidCampaign = new Schema({
         type: String,
         required: true
     },
+    recipients: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],    
     submissions: [{
         type: Schema.Types.ObjectId,
         ref: 'Event'

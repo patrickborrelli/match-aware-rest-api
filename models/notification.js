@@ -12,7 +12,7 @@ var Notification = new Schema({
     type: { 
         type: String,
         required: true,
-        enum: ['ASSIGNMENT', 'GENERAL', 'CLOSURE', 'NEW_EVENT', 'NEW_MESSAGE', 'MODIFIED_EVENT']
+        enum: ['ASSIGNMENT', 'GENERAL', 'CLOSURE', 'NEW_EVENT', 'NEW_MESSAGE', 'MODIFIED_EVENT', 'BID']
     },
     //the position field is only used with an assignment type of notification, indicating which position the ref or trainer is assigned to.
     position: {

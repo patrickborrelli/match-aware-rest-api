@@ -186,7 +186,10 @@ router.route('/getTeamsInAgeRange/:minBirthYear/:maxBirthYear')
             },
             function(ageGroups, wfCallback) {
                 async.forEach(ageGroups, function(ageGroup, callback) { 
-                    Team.find({age_group: ageGroup})
+                    Team.find({age_group: ageGroup})                    
+                        .populate('gender')
+                        .populate('age_group')
+                        .populate('club')
                         .exec(function(err, teams) {
                             if(err) throw err;
                             console.log("Found " + teams.length + " teams in age group " + ageGroup.name);

@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var async = require('async');
+var deepPopulate = require('mongoose-deep-populate');
 var TeamMember = require('../models/teamMember');
 var Team = require('../models/team');
 var Role = require('../models/role');
@@ -182,10 +183,14 @@ router.route('/findTeamsMembers/:teamId')
                 User.find({"_id": { "$in": teamMembers.map(function(cm) {
                         return cm.member._id })
                     }
-                }, function(err, members) {
-                    if(err) return next(err);
-                    res.json(members);
-                    callback(null, members);
+                })                    
+                    .populate('certifications')
+                    .populate('licenses')
+                    .deepPopulate('roles.role roles.club')
+                    .exec(function(err, members) {
+                        if(err) return next(err);
+                        res.json(members);
+                        callback(null, members);
                 });
             }
         ],

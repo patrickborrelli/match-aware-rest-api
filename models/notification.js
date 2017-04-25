@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Event = require('./event.js');
+var BidCampaign = require('./bidCampaign.js');
 var User = require('./user.js');
 
 var Notification = new Schema({
@@ -18,6 +19,10 @@ var Notification = new Schema({
     position: {
         type: String,
         enum: ['CENTER', 'SIDELINE', 'HEAD', 'ASSISTANT']
+    },
+    campaign: {
+        type: Schema.Types.ObjectId,
+        ref: 'BidCampaign'
     },
     event: {
         type: Schema.Types.ObjectId,

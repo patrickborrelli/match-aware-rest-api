@@ -16,6 +16,7 @@ router.route('/')
         .populate('event')
         .populate('sender')
         .populate('recipient')
+        .populate('campaign')
         .exec(function(err, notifications) {
             if(err) throw err;
             res.json(notifications);
@@ -72,6 +73,7 @@ router.route('/:notificationId')
         .populate('event')
         .populate('sender')
         .populate('recipient')
+        .populate('campaign')
         .exec(function(err, notification) {
             if(err) throw err;
             notification.remove();
@@ -89,6 +91,7 @@ router.route('/findByRecipient/:userId')
         .populate('event')
         .populate('sender')
         .populate('recipient')
+        .populate('campaign')
         .exec(function(err, notification) {
             if(err) throw err;
             res.json(notification);

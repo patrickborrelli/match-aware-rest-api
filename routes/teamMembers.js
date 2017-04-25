@@ -161,9 +161,9 @@ router.route('/findMembersTeams/:memberId')
 
 //#################################################################################################
 //#################################################################################################
-router.route('/findTeamsMembers/:teamId')
+router.route('/findTeamsMembersAsUsers/:teamId')
 
-//GET all members associated with this team:
+//GET all users associated with this team:
 .get(function(req, res, next) {
      async.waterfall(
         [
@@ -199,6 +199,23 @@ router.route('/findTeamsMembers/:teamId')
             console.log("Found members : " + members);
         }
     )   
+});
+
+//#################################################################################################
+//#################################################################################################
+router.route('/findTeamsMembers/:teamId')
+
+//GET all members associated with this team:
+.get(function(req, res, next) {
+     TeamMember.find({team: req.params.teamId})
+        .populate('team')
+        .deepPopulate('member.roles.role')
+        .populate('role')
+        .exec(function(err, teamMembers) {
+            if(err) return next(err);
+            console.log("Found " + teamMembers.length + " members on team.");
+            res.json(teamMembers);
+    });
 });
 
 

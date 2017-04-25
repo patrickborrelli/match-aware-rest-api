@@ -25,7 +25,7 @@ router.route('/')
     });
 })
 
-//POST add club role
+//POST add club role and adds the role to the user's array of roles:
 .post(Verify.verifyOrdinaryUser, function(req, res, next) {
     async.waterfall(
         [

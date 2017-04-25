@@ -3,6 +3,7 @@ var AgeGroup = require('./ageGroup.js');
 var Event = require('./event.js');
 var User = require('./user.js');
 var Schema = mongoose.Schema;
+var deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 var BidCampaign = new Schema({
     name: {
@@ -44,4 +45,5 @@ var BidCampaign = new Schema({
     timestamps: true
 });
 
+BidCampaign.plugin(deepPopulate);
 module.exports = mongoose.model('BidCampaign', BidCampaign);

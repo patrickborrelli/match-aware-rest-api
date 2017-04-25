@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var async = require('async');
+var deepPopulate = require('mongoose-deep-populate');
 var BidCampaign = require('../models/bidCampaign');
 var Verify = require('./verify');
 
@@ -14,6 +15,10 @@ router.route('/')
 //GET all bid campaigns
 .get(Verify.verifyOrdinaryUser, function(req, res, next) {
     BidCampaign.find(req.query)
+        .populate('min_age')
+        .populate('max_age')        
+        .populate('recipients')        
+        .populate('submissions')
         .exec(function(err, campaigns) {
             if(err) throw err;
             res.json(campaigns);
@@ -50,6 +55,10 @@ router.route('/:campaignId')
 ///GET bid campaign by ID
 .get(Verify.verifyOrdinaryUser, function(req, res, next) {
     BidCampaign.findById(req.params.campaignId)
+        .populate('min_age')
+        .populate('max_age')        
+        .populate('recipients')        
+        .populate('submissions')
         .exec(function(err, campaign) {
             if(err) throw err;
             res.json(campaign);
@@ -59,6 +68,10 @@ router.route('/:campaignId')
 //PUT update bid campaign by ID
 .put(Verify.verifyOrdinaryUser, function(req, res, next) {
     BidCampaign.findByIdAndUpdate(req.params.campaignId, {$set: req.body}, {new: true}) 
+        .populate('min_age')
+        .populate('max_age')        
+        .populate('recipients')        
+        .populate('submissions')
         .exec(function(err, campaign) {
             if(err) throw err;
             res.json(campaign);

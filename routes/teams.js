@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var async = require('async');
 var Team = require('../models/team');
+var AgeGroup = require('../models/ageGroup');
 var LeagueTeam = require("../models/leagueTeam")
 var Verify = require('./verify');
 
@@ -135,6 +136,74 @@ router.route('/getTeamWithLeagues/teams')
         ],
         function(err, newTeams) {
             res.json(newTeams);
+        }
+    ) 
+});
+
+//#################################################################################################
+//#################################################################################################
+router.route('/getTeamsInAgeRange/:minBirthYear/:maxBirthYear')
+
+///GET retrieve all teams that are between the provided age ranges:
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
+    
+    var myTeams = [];    
+    var low = parseInt(req.params.minBirthYear);
+    var high = parseInt(req.params.maxBirthYear);
+    var swap;
+    var birthYears = [];
+    var ageGroups = [];    
+    
+    //correct for any possiblity of the dates being swapped:
+    console.log("Received min: " + low + " and max: " + high);
+    if(low > high) {
+        swap = low;
+        low = high;
+        high = swap;
+        console.log("Corrected min: " + low + " and max: " + high);
+    }
+    
+    //build array of birth years to check
+    while(low <= high) {
+        birthYears.push(low.toString());
+        low++;
+    }
+    
+    async.waterfall(
+        [
+            function(wfCallback) {     
+                async.forEach(birthYears, function(birthYear, callback) { 
+                    AgeGroup.findOne({birth_year: birthYear})
+                        .exec(function(err, group) {
+                            if(err) throw err;
+                            ageGroups.push(group);
+                            callback();                            
+                    });                
+                }, function(err) {
+                    if (err) return next(err);
+                    wfCallback(null, ageGroups);
+                });
+            },
+            function(ageGroups, wfCallback) {
+                async.forEach(ageGroups, function(ageGroup, callback) { 
+                    Team.find({age_group: ageGroup})
+                        .exec(function(err, teams) {
+                            if(err) throw err;
+                            console.log("Found " + teams.length + " teams in age group " + ageGroup.name);
+                            console.log(teams);
+                            for(var i = 0; i < teams.length; i++) {
+                                myTeams.push(teams[i]);
+                            } 
+                        callback();
+                    });                
+                }, function(err) {
+                    if (err) return next(err);
+                    wfCallback(null, myTeams);
+                });
+            }
+        ],
+        function(err, myTeams) {
+            res.json(myTeams);
         }
     ) 
 });

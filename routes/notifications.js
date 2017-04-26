@@ -35,7 +35,7 @@ router.route('/')
 })
 
 .delete(Verify.verifyOrdinaryUser, function(req, res, next) {
-    Notification.remove({}, function(err, notifications) {
+    Notification.remove(req.query, function(err, notifications) {
         if(err) return next(err);
         console.log("Removed: \n" + notifications);
         res.json("All notifications removed.");

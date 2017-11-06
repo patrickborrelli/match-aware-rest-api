@@ -78,7 +78,7 @@ router.route('/:campaignId')
     });
 })
 
-///DELETE closure by ID
+///DELETE bid campaign by ID
 .delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     BidCampaign.findById(req.params.campaignId)
         .exec(function(err, campaign) {

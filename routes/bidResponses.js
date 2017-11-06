@@ -31,7 +31,7 @@ router.route('/')
     });
 })
 
-//DELETE all bid campaigns
+//DELETE all bid responses
 .delete(Verify.verifyOrdinaryUser, function(req, res, next) {
     BidResponse.find({}, function(err, bidResponses) {
         if(err) return next(err);
@@ -41,6 +41,45 @@ router.route('/')
             bidResponses[i].remove();
         }
         res.json("Successfully removed all bid responses.");        
+    });
+});
+
+
+//#################################################################################################
+//#################################################################################################
+router.route('/:bidResponseId')
+
+///GET bid response by ID
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
+    BidResponse.findById(req.params.bidResponseId)
+        .populate('events')
+        .populate('message')        
+        .populate('campaign')
+        .exec(function(err, bidResponse) {
+            if(err) throw err;
+            res.json(bidResponse);
+    });
+})
+
+//PUT update bid response by ID
+.put(Verify.verifyOrdinaryUser, function(req, res, next) {
+    BidResponse.findByIdAndUpdate(req.params.bidResponseId, {$set: req.body}, {new: true}) 
+        .populate('events')
+        .populate('message')        
+        .populate('campaign')
+        .exec(function(err, bidResponse) {
+            if(err) throw err;
+            res.json(bidResponse);
+    });
+})
+
+///DELETE bid response by ID
+.delete(Verify.verifyOrdinaryUser, function(req, res, next) {
+    BidResponse.findById(req.params.bidResponseId)
+        .exec(function(err, bidResponse) {
+            if(err) throw err;
+            bidResponse.remove();
+            res.json("Successfully removed " + bidResponse);
     });
 });
 

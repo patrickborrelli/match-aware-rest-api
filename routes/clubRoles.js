@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var ClubRole = require('../models/clubRole');
 var User = require('../models/user');
+var Role = require('../models/role');
 var async = require('async');
 var deepPopulate = require('mongoose-deep-populate');
 var Verify = require('./verify');
@@ -255,6 +256,55 @@ router.route('/findClubRole/:clubId/:roleId')
         [
             function(callback) {                
                 ClubRole.find({club: req.params.clubId, role: req.params.roleId})
+                    .populate('club')
+                    .populate('role')
+                    .populate('member')
+                    .exec(function(err, roles) {
+                        if(err) throw err;
+                        callback(null, roles);
+                });
+            },
+            function(roles, callback) {
+                console.log("Received " + roles.length + " club roles.");
+                console.log(roles);
+                var users = [];
+                
+                if(roles.length == 0) {
+                    callback(null, roles);
+                } else {
+                    //if there are roles found, add all to an array of users:
+                    for(var i = 0; i < roles.length; i++) {
+                        users.push(roles[i].member);
+                    }                    
+                    callback(null, users);
+                }
+            }
+        ],
+        function(err, users) {
+            if(err) return next(err);
+            res.json(users);
+        }
+    )    
+});
+
+//#################################################################################################
+//#################################################################################################
+router.route('/findClubCoaches/:clubId')
+
+//GET find all users taking the specified role for this club:
+.get(Verify.verifyOrdinaryUser, function(req, res, next) {
+    //first retreive all club roles, then return an array of users:
+     async.waterfall(
+        [   
+            function(callback) {                
+                Role.findOne({name: 'COACH'})
+                    .exec(function(err, role) {
+                        if(err) throw err;
+                        callback(null, role._id);
+                });
+            },
+            function(roleId, callback) {                
+                ClubRole.find({club: req.params.clubId, role: roleId})
                     .populate('club')
                     .populate('role')
                     .populate('member')

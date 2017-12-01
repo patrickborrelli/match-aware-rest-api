@@ -17,6 +17,7 @@ router.route('/')
         .populate('sender')
         .populate('recipient')
         .populate('campaign')
+        .populate('team_recipient')
         .exec(function(err, notifications) {
             if(err) throw err;
             res.json(notifications);
@@ -52,6 +53,8 @@ router.route('/:notificationId')
         .populate('event')
         .populate('sender')
         .populate('recipient')
+        .populate('campaign')
+        .populate('team_recipient')
         .exec(function(err, notification) {
             if(err) throw err;
             res.json(notification);
@@ -74,6 +77,7 @@ router.route('/:notificationId')
         .populate('sender')
         .populate('recipient')
         .populate('campaign')
+        .populate('team_recipient')
         .exec(function(err, notification) {
             if(err) throw err;
             notification.remove();
@@ -92,6 +96,7 @@ router.route('/findByRecipient/:userId')
         .populate('sender')
         .populate('recipient')
         .populate('campaign')
+        .populate('team_recipient')
         .exec(function(err, notification) {
             if(err) throw err;
             res.json(notification);

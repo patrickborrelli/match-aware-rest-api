@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 var Event = require('./event.js');
 var BidCampaign = require('./bidCampaign.js');
 var User = require('./user.js');
+var TeamMember = require(('./teamMember.js');
 
 var Notification = new Schema({
     //the status field is only used with an assignment type of notification, indicates the assignees response
@@ -36,6 +37,10 @@ var Notification = new Schema({
     recipient: {
         type: Schema.Types.ObjectId,
         ref: 'User'
+    },
+    team_recipient: {
+        type: Schema.Types.ObjectId,
+        ref: 'TeamMember'
     }
 }, {
     timestamps: true

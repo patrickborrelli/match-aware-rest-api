@@ -3,7 +3,8 @@ var bodyParser = require('body-parser');
 var async = require('async');
 var Team = require('../models/team');
 var AgeGroup = require('../models/ageGroup');
-var LeagueTeam = require("../models/leagueTeam")
+var LeagueTeam = require("../models/leagueTeam");
+var TeamMember = require("../models/teamMember");
 var Verify = require('./verify');
 
 var router = express.Router();
@@ -91,6 +92,7 @@ router.route('/getTeamWithLeagues/teams')
 .get(Verify.verifyOrdinaryUser, function(req, res, next) {
     
     var newTeams = [];
+    var teamsWithCoach = [];
 
     async.waterfall(
         [
@@ -132,10 +134,43 @@ router.route('/getTeamWithLeagues/teams')
                     if (err) return next(err);
                     callback(null, newTeams);
                 });
+            },
+            function(newTeams, callback) {     
+                async.forEach(newTeams, function(team, callback) { 
+                    TeamMember.find({team: team._id}) 
+                        .populate('team')
+                        .populate('member')
+                        .populate('role')
+                        .exec(function(err, members) {
+                            if(err) throw err;
+                            console.log("Found " + members.length + " members for team " + team.name);
+                            console.log(members);
+                            var newTeamWithCoach = {
+                                _id: team._id,
+                                name: team.name,
+                                gender: team.gender,
+                                age_group: team.age_group,
+                                club: team.club,
+                                leagues: team.leagues
+                            }
+                            for(var i = 0; i < members.length; i++) {
+                                if(members[i].role.name == 'COACH') {
+                                    newTeamWithCoach.headcoach = members[i].member;
+                                    break;
+                                }
+                            }
+                            
+                            teamsWithCoach.push(newTeamWithCoach);
+                            callback();                            
+                    });                
+                }, function(err) {
+                    if (err) return next(err);
+                    callback(null, teamsWithCoach);
+                });
             }
         ],
-        function(err, newTeams) {
-            res.json(newTeams);
+        function(err, teamsWithCoach) {
+            res.json(teamsWithCoach);
         }
     ) 
 });

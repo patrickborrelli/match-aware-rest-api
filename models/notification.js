@@ -4,6 +4,7 @@ var Event = require('./event.js');
 var BidCampaign = require('./bidCampaign.js');
 var User = require('./user.js');
 var TeamMember = require('./teamMember.js');
+var deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 var Notification = new Schema({
     //the status field is only used with an assignment type of notification, indicates the assignees response
@@ -46,4 +47,5 @@ var Notification = new Schema({
     timestamps: true
 });
 
+Notification.plugin(deepPopulate);
 module.exports = mongoose.model('Notification', Notification);

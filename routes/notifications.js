@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var Notification = require('../models/notification');
+var deepPopulate = require('mongoose-deep-populate');
 var Verify = require('./verify');
 
 var router = express.Router();
@@ -17,7 +18,7 @@ router.route('/')
         .populate('sender')
         .populate('recipient')
         .populate('campaign')
-        .populate('team_recipient')
+        .deepPopulate('team_recipient.team team_recipient.team.age_group team_recipient.member team_recipient.club')
         .exec(function(err, notifications) {
             if(err) throw err;
             res.json(notifications);
@@ -54,7 +55,7 @@ router.route('/:notificationId')
         .populate('sender')
         .populate('recipient')
         .populate('campaign')
-        .populate('team_recipient')
+        .deepPopulate('team_recipient.team team_recipient.team.age_group team_recipient.member team_recipient.club')
         .exec(function(err, notification) {
             if(err) throw err;
             res.json(notification);
@@ -77,7 +78,7 @@ router.route('/:notificationId')
         .populate('sender')
         .populate('recipient')
         .populate('campaign')
-        .populate('team_recipient')
+        .deepPopulate('team_recipient.team team_recipient.team.age_group team_recipient.member team_recipient.club')
         .exec(function(err, notification) {
             if(err) throw err;
             notification.remove();
@@ -96,7 +97,7 @@ router.route('/findByRecipient/:userId')
         .populate('sender')
         .populate('recipient')
         .populate('campaign')
-        .populate('team_recipient')
+        .deepPopulate('team_recipient.team team_recipient.team.age_group team_recipient.member team_recipient.club')
         .exec(function(err, notification) {
             if(err) throw err;
             res.json(notification);

@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var BidResponse = require('../models/bidResponse');
+var deepPopulate = require('mongoose-deep-populate');
 var Verify = require('./verify');
 
 var router = express.Router();
@@ -16,6 +17,7 @@ router.route('/')
         .populate('events')
         .populate('message')        
         .populate('campaign')
+        .deepPopulate('sender.team sender.member sender.club')
         .exec(function(err, responses) {
             if(err) throw err;
             res.json(responses);
@@ -55,6 +57,7 @@ router.route('/:bidResponseId')
         .populate('events')
         .populate('message')        
         .populate('campaign')
+        .deepPopulate('sender.team sender.member sender.club')
         .exec(function(err, bidResponse) {
             if(err) throw err;
             res.json(bidResponse);
@@ -67,6 +70,7 @@ router.route('/:bidResponseId')
         .populate('events')
         .populate('message')        
         .populate('campaign')
+        .deepPopulate('sender.team sender.member sender.club')
         .exec(function(err, bidResponse) {
             if(err) throw err;
             res.json(bidResponse);
@@ -94,6 +98,7 @@ router.route('/findAllByCampaign/:campaignId')
         .populate('events')
         .populate('message')        
         .populate('campaign')
+        .deepPopulate('sender.team sender.member sender.club')
         .exec(function(err, responses) {
             if(err) throw err;
             res.json(responses);
@@ -124,6 +129,7 @@ router.route('/findByCampaignAndStatus/:campaignId/:status')
         .populate('events')
         .populate('message')        
         .populate('campaign')
+        .deepPopulate('sender.team sender.member sender.club')
         .exec(function(err, responses) {
             if(err) throw err;
             res.json(responses);
